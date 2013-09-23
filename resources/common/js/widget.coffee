@@ -114,6 +114,22 @@ class Widget extends Module
     add_css_class: (name, el)->
         el = @element if not el
         el.classList.add(name)
+
     remove_css_class: (name, el)->
         el = @element if not el
         el.classList.remove(name)
+
+    set_style: (attr, value) ->
+        if @element.style[attr]
+            @element.style[attr] = value
+        else
+            throw "no such a css attribute #{attr}"
+
+    show_element: (display)->
+        @set_style('display', display || 'block')
+
+    hide_element: ->
+        @set_style('display', 'none')
+
+    is_shown: ->
+        @element.style.display != "none"

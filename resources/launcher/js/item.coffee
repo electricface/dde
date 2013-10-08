@@ -126,8 +126,8 @@ class Item extends Widget
             @element.style.display = 'none'
             Item.display_temp = false
         hidden_icons[@id] = @
-        hide_category()
-        _update_scroll_bar(category_infos[selected_category_id].length - _get_hidden_icons_ids().length)
+        # hide_category()
+        # _update_scroll_bar(category_infos[selected_category_id].length - _get_hidden_icons_ids().length)
 
     display_icon: (e)=>
         @display_mode = 'display'
@@ -136,17 +136,17 @@ class Item extends Widget
             @remove_css_class(HIDE_ICON_CLASS, @element)
         delete hidden_icons[@id]
         hidden_icons_num = _get_hidden_icons_ids().length
-        show_category()
+        # show_category()
         if hidden_icons_num == 0
             is_show_hidden_icons = false
             _show_hidden_icons(is_show_hidden_icons)
-        _update_scroll_bar(category_infos[selected_category_id].length - hidden_icons_num)
+        # _update_scroll_bar(category_infos[selected_category_id].length - hidden_icons_num)
 
     display_icon_temp: ->
         @element.style.display = 'block'
         Item.display_temp = true
         show_category()
-        _update_scroll_bar(category_infos[selected_category_id].length)
+        # _update_scroll_bar(category_infos[selected_category_id].length)
 
     toggle_icon: ->
         if @display_mode == 'display'

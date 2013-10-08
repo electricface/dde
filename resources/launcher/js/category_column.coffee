@@ -19,22 +19,30 @@
 
 class CategoryColumn
     constructor: (@parent)->
+        echo 'init category'
         @category = $("#category")
         @select_category_timeout_id = 0
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
         @s_box = @parent.parent.search_bar
+        @grid = @parent.grid
+        @config = @parent.config
+
+        # key: category id
+        # value: a list of Item's id which is in category
+        @category_infos = []
 
         frag = document.createDocumentFragment()
         for info in DCore.Launcher.get_categories()
             c = @create_category(info)
             frag.appendChild(c)
-            @load_category_infos(info.ID, sort_methods[sort_method])
+            @load_category_infos(info.ID, @config.sort_method())
 
         @category.appendChild(frag)
 
         @set_adaptive_height()
+        @show_selected_category()
 
-    @create_category = (info) ->
+    create_category: (info) ->
         el = document.createElement('div')
 
         el.setAttribute('class', 'category_name')
@@ -48,18 +56,33 @@ class CategoryColumn
         el.addEventListener('mouseover', (e)=>
             e.stopPropagation()
             if info.ID != @selected_category_id
-                s_box.value = "" if s_box.value != ""
-                _select_category_timeout_id = setTimeout(
+                @s_box.clean() if !@s_box.empty()
+                @select_category_timeout_id = setTimeout(
                     =>
-                        grid_load_category(info.ID)
+                        # grid_load_category(info.ID)
                         @selected_category_id = info.ID
+                        @show_selected_category()
                     , 25)
         )
-        el.addEventListener('mouseout', (e)->
-            if _select_category_timeout_id != 0
-                clearTimeout(_select_category_timeout_id)
+        el.addEventListener('mouseout', (e)=>
+            if @select_category_timeout_id != 0
+                clearTimeout(@select_category_timeout_id)
         )
         return el
+
+    load_category_infos: (cat_id, sort_func)->
+        if cat_id == ALL_APPLICATION_CATEGORY_ID
+            frag = document.createDocumentFragment()
+            @category_infos[cat_id] = []
+            for own key, value of applications
+                frag.appendChild(value.element)
+                @category_infos[cat_id].push(key)
+            # @grid.grid.appendChild(frag)
+        else
+            info = DCore.Launcher.get_items_by_category(cat_id)
+            @category_infos[cat_id] = info
+
+        sort_func(@category_infos[cat_id])
 
     set_adaptive_height: ->
         warp = @category.parentNode
@@ -68,6 +91,15 @@ class CategoryColumn
         if categories_height > warp.clientHeight
             warp.style.overflowY = "scroll"
             warp.style.marginBottom = "#{GRID_MARGIN_BOTTOM}px"
+
+    show_selected_category: ->
+        cns = $s(".category_name")
+        for c in cns
+            if `this.selected_category_id == c.getAttribute("cat_id")`
+                c.classList.add('category_selected')
+            else
+                c.classList.remove('category_selected')
+        return
 
     hide_empty_category: ->
         for own i of @category_infos
@@ -80,7 +112,7 @@ class CategoryColumn
                 # "==" in coffee is "===" in js
                 if "" + @selected_category_id == i
                     @selected_category_id = ALL_APPLICATION_CATEGORY_ID
-                grid_load_category(@selected_category_id)
+                # grid_load_category(@selected_category_id)
 
     show_nonempty_category: ->
 

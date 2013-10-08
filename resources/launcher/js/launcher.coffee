@@ -19,6 +19,7 @@
 
 class Launcher
     constructor: ->
+        echo 'init launcher'
         try
             @s_dock = DCore.DBus.session("com.deepin.dde.dock")
         catch error

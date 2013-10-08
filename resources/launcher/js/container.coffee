@@ -17,9 +17,59 @@
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+get_name_by_id = (id) ->
+    if Widget.look_up(id)?
+        DCore.DEntry.get_name(Widget.look_up(id).core)
+    else
+        ""
+
+
+sort_by_name = (items)->
+    items.sort((lhs, rhs)->
+        lhs_name = get_name_by_id(lhs)
+        rhs_name = get_name_by_id(rhs)
+        compare_string(lhs_name, rhs_name)
+    )
+
+
+sort_by_rate = do ->
+    rates = null
+    items_name_map = {}
+
+    (items, update)->
+        if update
+            rates = DCore.Launcher.get_app_rate()
+
+            items_name_map = {}
+            for id in category_infos[ALL_APPLICATION_CATEGORY_ID]
+                if not items_name_map[id]?
+                    items_name_map[id] =
+                        DCore.DEntry.get_appid(Widget.look_up(id).core)
+
+        items.sort((lhs, rhs)->
+            lhs_appid = items_name_map[lhs]
+            lhs_rate = rates[lhs_appid] if lhs_appid?
+
+            rhs_appid = items_name_map[rhs]
+            rhs_rate = rates[rhs_appid] if rhs_appid?
+
+            if lhs_rate? and rhs_rate?
+                rates_delta = rhs_rate - lhs_rate
+                if rates_delta == 0
+                    return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
+                else
+                    return rates_delta
+            else if lhs_rate? and not rhs_rate?
+                return -1
+            else if not lhs_rate? and rhs_rates?
+                return 1
+            else
+                return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
+        )
+
 class Config
     constructor: ->
-        @sort_method_name
+        @read()
         @methods =
             "name": sort_by_name
             "rate": sort_by_rate
@@ -28,14 +78,17 @@ class Config
         @methods[@sort_method_name]
 
     read: ->
+        @sort_method_name = "name"
 
     save: ->
         DCore.Launcher.save_config('sort_method', @sort_method_name)
 
 
 class Container
-    contructor: (@parent)->
+    constructor: (@parent)->
+        echo 'init container'
         @search_bar = @parent.search_bar
+
         @config = new Config(@)
         @s_dock = @parent.s_dock
 
@@ -45,8 +98,8 @@ class Container
             id = DCore.DEntry.get_id(core)
             @apps[id] = new Item(id, core, @)
 
-        @category_column = new CategoryColumn(@)
         @grid = new Grid(@)
+        @category_column = new CategoryColumn(@)
 
     reset: ->
         @grid.reset()

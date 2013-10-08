@@ -19,6 +19,7 @@
 
 class SearchBar
     constructor: (@parent)->
+        echo 'init search bar'
         @s_box = $("#s_box")
         @s_box.setAttribute("placeholder", _("Type to search..."))
 

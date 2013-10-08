@@ -19,7 +19,7 @@
 
 class HiddenIconList
     constructor: (@parent)->
-        @apps = @parent.applications
+        @apps = @parent.apps
         @hidden_icons = {}
         @length = 0
 
@@ -38,7 +38,7 @@ class HiddenIconList
         @length
 
     add: (item)->
-        @hide_icon[item.id] = item
+        @hidden_icons[item.id] = item
         @length += 1
         item
 

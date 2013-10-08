@@ -30,13 +30,6 @@ hidden_icons = {}
 
 is_show_hidden_icons = false
 
-
-
-
-sort_methods =
-    "name": sort_by_name
-    "rate": sort_by_rate
-
 exit_launcher = ->
     s_box.value = ""
     selected_category_id = ALL_APPLICATION_CATEGORY_ID

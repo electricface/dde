@@ -31,6 +31,7 @@ class Launcher
     exit: ->
         @search_bar.clean()
         @container.reset()
+        DCore.Launcher.exit_gui()
 
     bind_events: ->
         @

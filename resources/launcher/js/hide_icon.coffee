@@ -19,10 +19,12 @@
 
 class HiddenIconList
     constructor: (@parent)->
+        echo 'init hidden icon list'
         @apps = @parent.apps
         @hidden_icons = {}
         @length = 0
 
+    load: ->
         hidden_icon_ids = DCore.Launcher.load_hidden_apps()
         if hidden_icon_ids?
             hidden_icon_ids.filter((elem, index, array) =>
@@ -34,22 +36,21 @@ class HiddenIconList
                 if @apps[id]
                     @add(@apps[id]).hide_icon()
 
-    length: ->
-        @length
-
     add: (item)->
         @hidden_icons[item.id] = item
         @length += 1
+        @save()
         item
 
     remove: (item)->
-        delete hidden_icons[item.id]
+        delete @hidden_icons[item.id]
         @length -= 1
+        @save()
         item
 
     save: ->
         hidden_icons_ids = []
-        for own id of hidden_icons
+        for own id of @hidden_icons
             hidden_icons_ids.push(id)
         DCore.Launcher.save_hidden_apps(hidden_icons_ids)
 
@@ -59,5 +60,5 @@ class HiddenIconList
                 @hidden_icons[item].display_icon_temp()
 
     hide: ->
-        for own item of hidden_icons
-            hidden_icons[item].hide_icon()
+        for own item of @hidden_icons
+            @hidden_icons[item].hide_icon()

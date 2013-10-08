@@ -1,11 +1,12 @@
 class Item extends Widget
     @theme_icon: null
-    @hover_item_id: null
     @display_temp: false
 
     constructor: (@id, @core, @parent)->
         super
         @load_img()
+        @grid = @parent.grid
+        @hidden_icons = @grid.hidden_icons
 
         @name = create_element("div", "item_name", @element)
         @name.innerText = DCore.DEntry.get_name(@core)
@@ -109,7 +110,7 @@ class Item extends Widget
         e.stopPropagation()
         @element.style.cursor = 'wait'
         DCore.DEntry.launch(@core, [])
-        Item.hover_item_id = @id
+        @grid.hover_item_id = @id
         @element.style.cursor = 'auto'
         exit_launcher()
 
@@ -125,7 +126,8 @@ class Item extends Widget
         if not Item.display_temp and not is_show_hidden_icons
             @element.style.display = 'none'
             Item.display_temp = false
-        hidden_icons[@id] = @
+        @hidden_icons.add(@)
+        # hidden_icons[@id] = @
         # hide_category()
         # _update_scroll_bar(category_infos[selected_category_id].length - _get_hidden_icons_ids().length)
 
@@ -134,12 +136,13 @@ class Item extends Widget
         @element.style.display = 'block'
         if HIDE_ICON_CLASS in @element.classList
             @remove_css_class(HIDE_ICON_CLASS, @element)
-        delete hidden_icons[@id]
-        hidden_icons_num = _get_hidden_icons_ids().length
+        @hidden_icons.remove(@)
+        # delete hidden_icons[@id]
+        # hidden_icons_num = _get_hidden_icons_ids().length
         # show_category()
-        if hidden_icons_num == 0
-            is_show_hidden_icons = false
-            _show_hidden_icons(is_show_hidden_icons)
+        # if hidden_icons_num == 0
+        #     is_show_hidden_icons = false
+        #     _show_hidden_icons(is_show_hidden_icons)
         # _update_scroll_bar(category_infos[selected_category_id].length - hidden_icons_num)
 
     display_icon_temp: ->
@@ -202,10 +205,9 @@ class Item extends Widget
         @element.style.background = "rgba(0, 183, 238, 0.2)"
         @element.style.border = "1px rgba(255, 255, 255, 0.2) solid"
         @element.style.borderRadius = "2px"
-        Item.hover_item_id = @id
+        @grid.hover_item_id = @id
 
     do_mouseout: =>
         @element.style.background = ''
         @element.style.border = "1px rgba(255, 255, 255, 0.0) solid"
         @element.style.borderRadius = ""
-        # Item.hover_item_id = null

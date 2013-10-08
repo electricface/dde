@@ -67,6 +67,7 @@ sort_by_rate = do ->
                 return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
         )
 
+
 class Config
     constructor: ->
         @read()
@@ -94,12 +95,17 @@ class Container
 
         all_items = DCore.Launcher.get_items_by_category(ALL_APPLICATION_CATEGORY_ID)
         @apps = []
+        @grid = new Grid(@)
         for core in all_items
             id = DCore.DEntry.get_id(core)
             @apps[id] = new Item(id, core, @)
 
-        @grid = new Grid(@)
         @category_column = new CategoryColumn(@)
+
+        @grid.render(@category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
+        @grid.load_category(ALL_APPLICATION_CATEGORY_ID)
+        @grid.hidden_icons.load()
+        @grid.hidden_icons.hide()
 
     reset: ->
         @grid.reset()

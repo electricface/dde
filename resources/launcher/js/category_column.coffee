@@ -21,11 +21,12 @@ class CategoryColumn
     constructor: (@parent)->
         echo 'init category'
         @category = $("#category")
-        @select_category_timeout_id = 0
+        @select_category_timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
         @s_box = @parent.parent.search_bar
         @grid = @parent.grid
         @config = @parent.config
+        @apps = @parent.apps
 
         # key: category id
         # value: a list of Item's id which is in category
@@ -35,7 +36,7 @@ class CategoryColumn
         for info in DCore.Launcher.get_categories()
             c = @create_category(info)
             frag.appendChild(c)
-            @load_category_infos(info.ID, @config.sort_method())
+            @load_category_infos(@grid.grid, info.ID, @config.sort_method())
 
         @category.appendChild(frag)
 
@@ -59,7 +60,7 @@ class CategoryColumn
                 @s_box.clean() if !@s_box.empty()
                 @select_category_timeout_id = setTimeout(
                     =>
-                        # grid_load_category(info.ID)
+                        @grid.load_category(info.ID)
                         @selected_category_id = info.ID
                         @show_selected_category()
                     , 25)
@@ -70,14 +71,14 @@ class CategoryColumn
         )
         return el
 
-    load_category_infos: (cat_id, sort_func)->
+    load_category_infos: (grid, cat_id, sort_func)->
         if cat_id == ALL_APPLICATION_CATEGORY_ID
             frag = document.createDocumentFragment()
             @category_infos[cat_id] = []
-            for own key, value of applications
+            for own key, value of @apps
                 frag.appendChild(value.element)
                 @category_infos[cat_id].push(key)
-            # @grid.grid.appendChild(frag)
+            grid.appendChild(frag)
         else
             info = DCore.Launcher.get_items_by_category(cat_id)
             @category_infos[cat_id] = info
@@ -104,7 +105,7 @@ class CategoryColumn
     hide_empty_category: ->
         for own i of @category_infos
             all_is_hidden = @category_infos["#{i}"].every((el, idx, arr) ->
-                applications[el].display_mode == "hidden"
+                @apps[el].display_mode == "hidden"
             )
             if all_is_hidden and not Item.display_temp
                 $("##{i}").style.display = "none"
@@ -112,8 +113,13 @@ class CategoryColumn
                 # "==" in coffee is "===" in js
                 if "" + @selected_category_id == i
                     @selected_category_id = ALL_APPLICATION_CATEGORY_ID
-                # grid_load_category(@selected_category_id)
+                @grid.load_category(@selected_category_id)
 
     show_nonempty_category: ->
 
     reset: ->
+        @selected_category_id = ALL_APPLICATION_CATEGORY_ID
+        if @select_category_timeout_id
+            clearTimeout(@select_category_timeout_id)
+            @select_category_timeout_id = null
+        @show_selected_category()

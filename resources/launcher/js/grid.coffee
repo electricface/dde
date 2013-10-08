@@ -21,11 +21,21 @@
 
 class Grid
     constructor: (@parent)->
+        echo 'init grid'
         @apps = @parent.apps
         @grid = $('#grid')
+        @item_selected = null
+        @hover_item_id = null
         @hidden_icons = new HiddenIconList(@)
 
     reset: ->
+        @get_first_shown()?.scroll_to_view()
+        @hidden_icons.save()
+        @hidden_icons.hide()
+        @load_category(ALL_APPLICATION_CATEGORY_ID)
+        if @hover_item_id
+            event = new Event("mouseout")
+            Widget.look_up(@hover_item_id).element.dispatchEvent(event)
 
     render: (items) ->
         for id in items
@@ -44,33 +54,30 @@ class Grid
         else
             @grid.style.overflowY = "hidden"
 
-    grid_show_items: (items) ->
-        update_selected(null)
+    show_items: (items) ->
+        @update_selected(null)
 
-        @update_scroll_bar(@hidden_icons.length())
+        @update_scroll_bar(@hidden_icons.length)
 
-        for own key, value of applications
+        for own key, value of @apps
             if key not in items
                 value.hide()
 
         count = 0
         for id in items
             group_num = parseInt(count++ / NUM_SHOWN_ONCE)
-            setTimeout(applications[id].show, 4 + group_num)
+            setTimeout(@apps[id].show, 4 + group_num)
 
         return  # some return like here will keep js converted by coffeescript returning stupid things
 
-
-    grid_load_category: (cat_id) ->
-        # _show_grid_selected(cat_id)
-        grid_show_items(category_infos[cat_id])
-        update_selected(null)
-
+    load_category: (cat_id) ->
+        @show_items(@parent.category_column.category_infos[cat_id])
+        @update_selected(null)
 
     init_grid: ->
         sort_category_info(sort_methods[sort_method])
-        @render(category_infos[ALL_APPLICATION_CATEGORY_ID])
-        grid_load_category(ALL_APPLICATION_CATEGORY_ID)
+        @render(@parent.category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
+        @load_category(ALL_APPLICATION_CATEGORY_ID)
 
     show_grid_dom_child: ->
         c = @grid.children
@@ -79,72 +86,63 @@ class Grid
             echo "#{get_name_by_id(c[i].id)}"
             i = i + 1
 
-    item_selected = null
-
-    @get_item_row_count: ->
+    get_item_row_count: ->
         parseInt(@grid.clientWidth / ITEM_WIDTH)
 
-    @update_selected: (el)->
-        item_selected?.unselect()
-        item_selected = el
-        item_selected?.select()
+    update_selected: (el)->
+        @item_selected?.unselect()
+        @item_selected = el
+        @item_selected?.select()
 
-    @get_first_shown: ->
-        first_item = applications[$(".item").id]
+    get_first_shown: ->
+        first_item = @apps[$(".item").id]
         if first_item.is_shown()
             first_item
         else
             first_item.next_shown()
 
-    @selected_next: ->
-        if not item_selected
-            item_selected = get_first_shown()
-            update_selected(item_selected)
-            item_selected.scroll_to_view()
-            return
-        n = item_selected.next_shown()
-        if n
-            n.scroll_to_view()
-            update_selected(n)
-    @selected_prev: ->
-        if not item_selected
-            item_selected = get_first_shown()
-            update_selected(item_selected)
-            item_selected.scroll_to_view()
-            return
-        n = item_selected.prev_shown()
-        if n
-            n.scroll_to_view()
-            update_selected(n)
+    show_first_shown: ->
+        first_shown = @get_first_shown()
+        @update_selected(first_shown)
+        @item_selected.scroll_to_view()
 
-    @selected_down: ->
-        if not item_selected
-            item_selected = get_first_shown()
-            update_selected(item_selected)
-            item_selected.scroll_to_view()
+    show_item_shown: (item)->
+        if item
+            item.scroll_to_view()
+            @update_selected(item)
+
+    selected_next: ->
+        if not @item_selected
+            @show_first_shown()
             return
-        n = item_selected
+
+        @show_item_shown(@item_selected.next_shown())
+
+    selected_prev: ->
+        if not @item_selected
+            @show_first_shown()
+            return
+
+        @show_item_shown(@item_selected.prev_shown())
+
+    selected_down: ->
+        if not @item_selected
+            @show_first_shown()
+            return
+
+        n = @item_selected
         for i in [0..get_item_row_count()-1]
-            if n
-                n.scroll_to_view()
-                n = n.next_shown()
-        if n
-            n.scroll_to_view()
-            update_selected(n)
+            n = n?.next_shown()
+        @show_item_shown(n)
         @grid.scrollTop += SCROLL_STEP_LEN
 
-    @selected_up: ->
-        if not item_selected
-            item_selected = get_first_shown()
-            update_selected(item_selected)
-            item_selected.scroll_to_view()
+    selected_up: ->
+        if not @item_selected
+            @show_first_shown()
             return
-        n = item_selected
+
+        n = @item_selected
         for i in [0..get_item_row_count()-1]
-            if n
-                n.scroll_to_view()
-                n = n.prev_shown()
-        if n
-            n.scroll_to_view()
-            update_selected(n)
+            n = n?.prev_shown()
+        @show_item_shown(n)
         @grid.scrollTop -= SCROLL_STEP_LEN

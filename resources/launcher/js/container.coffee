@@ -80,6 +80,10 @@ class Config
 
     read: ->
         @sort_method_name = "name"
+        if (method_name = DCore.Launcher.sort_method())?
+            @sort_method_name = method_name
+        else
+            save()
 
     save: ->
         DCore.Launcher.save_config('sort_method', @sort_method_name)

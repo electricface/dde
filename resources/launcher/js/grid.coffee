@@ -44,6 +44,7 @@ class Grid
         return items
 
     update_scroll_bar: (len) ->
+        echo "items length: #{len}"
         ratio_row_number = ITEM_WIDTH * len / @grid.clientWidth
         row_number = Math.floor(ratio_row_number)
         if ratio_row_number != row_number
@@ -57,7 +58,11 @@ class Grid
     show_items: (items) ->
         @update_selected(null)
 
-        @update_scroll_bar(@hidden_icons.length)
+        count = 0
+        for i in @hidden_icons
+            if i in items
+                count += 1
+        @update_scroll_bar(items.length - count)
 
         for own key, value of @apps
             if key not in items

@@ -27,7 +27,9 @@ init_search_box = ->
             e.stopPropagation()
     )
 
-    s_box.addEventListener('input', s_box.blur())
+    s_box.addEventListener('input', ->
+        s_box.blur()
+    )
 
     DCore.signal_connect("im_commit", (info)->
         s_box.value += info.Content

@@ -3,7 +3,7 @@ class Item extends Widget
     @hover_item_id: null
     @display_temp: false
 
-    constructor: (@id, @core)->
+    constructor: (@id, @core, @parent)->
         super
         @load_img()
 
@@ -13,13 +13,20 @@ class Item extends Widget
         @element.draggable = true
         @hide_element()
 
-        try_set_title(@element, DCore.DEntry.get_name(@core), 80)
+        @try_set_title(DCore.DEntry.get_name(@core), 80)
         @display_mode = 'display'
 
         if DCore.Launcher.is_autostart(@core)
             @add_to_autostart()
 
         @element.addEventListener("contextmenu", Item._contextmenu_callback(@))
+
+    try_set_title: (text, width)->
+        setTimeout(=>
+            height = calc_text_size(text, width)
+            if height > 38
+                @element.setAttribute('title', text)
+        , 200)
 
     load_img: ->
         im = DCore.DEntry.get_icon(@core)
@@ -73,13 +80,14 @@ class Item extends Widget
             startup_msg = NOT_STARTUP_ICON
         else
             startup_msg = STARTUP_ICON
+
         menu = [
             [1, _("_Open")],
             [],
             [2, hide_icon_msg],
             [],
             [3, _("Send to d_esktop"), not DCore.Launcher.has_this_item_on_desktop(@core)],
-            [4, _("Send to do_ck"), s_dock!=null],
+            [4, _("Send to do_ck"), @parent.s_dock!=null],
             [],
             [5, startup_msg]
         ]
@@ -99,10 +107,10 @@ class Item extends Widget
 
     do_click: (e)=>
         e.stopPropagation()
-        set_style('cursor', 'wait')
+        @element.style.cursor = 'wait'
         DCore.DEntry.launch(@core, [])
         Item.hover_item_id = @id
-        set_style('cursor', 'auto')
+        @element.style.cursor = 'auto'
         exit_launcher()
 
     do_dragstart: (e)=>
@@ -138,6 +146,7 @@ class Item extends Widget
         @element.style.display = 'block'
         Item.display_temp = true
         show_category()
+        _update_scroll_bar(category_infos[selected_category_id].length)
 
     toggle_icon: ->
         if @display_mode == 'display'
@@ -152,7 +161,7 @@ class Item extends Widget
             when 1 then DCore.DEntry.launch(@core, [])
             when 2 then @toggle_icon()
             when 3 then DCore.DEntry.copy_dereference_symlink([@core], DCore.Launcher.get_desktop_entry())
-            when 4 then s_dock.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
+            when 4 then @parent.s_dock.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
             when 5 then @toggle_autostart()
             when 100 then DCore.DEntry.report_bad_icon(@core)  # internal
 
@@ -190,13 +199,13 @@ class Item extends Widget
         @element.scrollIntoViewIfNeeded()
 
     do_mouseover: =>
-        @set_style('background', "rgba(0, 183, 238, 0.2)")
-        @set_style('border',  "1px rgba(255, 255, 255, 0.2) solid")
-        @set_style('borderRadius', "2px")
+        @element.style.background = "rgba(0, 183, 238, 0.2)"
+        @element.style.border = "1px rgba(255, 255, 255, 0.2) solid"
+        @element.style.borderRadius = "2px"
         Item.hover_item_id = @id
 
     do_mouseout: =>
-        @set_style('background', "")
-        @set_style('border', "1px rgba(255, 255, 255, 0.0) solid")
-        @set_style('borderRadius', "")
+        @element.style.background = ''
+        @element.style.border = "1px rgba(255, 255, 255, 0.0) solid"
+        @element.style.borderRadius = ""
         # Item.hover_item_id = null

@@ -105,7 +105,7 @@ DCore.signal_connect('workarea_changed', (alloc)->
     $('#grid').style.maxHeight = "#{height-60}px"
 )
 DCore.signal_connect("lost_focus", (info)->
-    if s_dock.LauncherShouldExit_sync(info.xid)
+    if @s_dock.LauncherShouldExit_sync(info.xid)
         exit_launcher()
 )
 inited = false
@@ -118,6 +118,7 @@ DCore.signal_connect("draw_background", (info)->
 DCore.signal_connect("update_items", ->
     echo "update items"
 
+    return
     applications = {}
     hidden_icons = {}
     category_infos = []
@@ -314,10 +315,11 @@ _init_hidden_icons = do ->
         return
 
 
-init_search_box()
-init_all_applications()
-init_category_list()
-init_grid()
-_init_hidden_icons()
+# init_search_box()
+# init_all_applications()
+# init_category_list()
+# init_grid()
+# _init_hidden_icons()
+new Launcher().bind_events().connect_signal()
 DCore.Launcher.webview_ok()
 

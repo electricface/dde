@@ -97,7 +97,7 @@ class Config
 
 class Container
     constructor: (@parent)->
-        echo 'init container'
+        # echo 'init container'
         @search_bar = @parent.search_bar
 
         @config = new Config(@)

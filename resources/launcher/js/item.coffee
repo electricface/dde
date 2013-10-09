@@ -136,33 +136,33 @@ class Item extends Widget
 
     hide_icon: (e)=>
         @display_mode = 'hidden'
+
         if HIDE_ICON_CLASS not in @element.classList
             @add_css_class(HIDE_ICON_CLASS, @element)
-        if not Item.display_temp and not is_show_hidden_icons
+
+        if not Item.display_temp and not @grid.show_hidden_icons
             @element.style.display = 'none'
-            Item.display_temp = false
+
         @hidden_icons.add(@)
-        @category_column.hide_empty_category()
-        # _update_scroll_bar(category_infos[selected_category_id].length - _get_hidden_icons_ids().length)
+        # @grid.update_scroll_bar(@category_column.selected_category_infos.length - hidden_icons_num)
 
     display_icon: (e)=>
         @display_mode = 'display'
         @element.style.display = 'block'
+
         if HIDE_ICON_CLASS in @element.classList
             @remove_css_class(HIDE_ICON_CLASS, @element)
+
         @hidden_icons.remove(@)
-        @category_column.show_nonempty_category()
         # hidden_icons_num = _get_hidden_icons_ids().length
         # if hidden_icons_num == 0
         #     is_show_hidden_icons = false
         #     _show_hidden_icons(is_show_hidden_icons)
-        # _update_scroll_bar(category_infos[selected_category_id].length - hidden_icons_num)
+        # @grid.update_scroll_bar(@category_column.selected_category_infos.length - hidden_icons_num)
 
     display_icon_temp: ->
         @element.style.display = 'block'
-        Item.display_temp = true
-        @category_column.show_nonempty_category()
-        # _update_scroll_bar(category_infos[selected_category_id].length)
+        @grid.update_scroll_bar(@category_column.selected_category_infos().length)
 
     toggle_icon: ->
         if @display_mode == 'display'

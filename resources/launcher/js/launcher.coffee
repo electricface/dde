@@ -19,7 +19,7 @@
 
 class Launcher
     constructor: ->
-        echo 'init launcher'
+        # echo 'init launcher'
         @body = document.body
         try
             @dock = DCore.DBus.session("com.deepin.dde.dock")
@@ -107,39 +107,3 @@ class Launcher
                             else
                                 @container.grid.get_first_shown()?.do_click(e)
         )
-        @
-
-    connect_signals: ->
-        DCore.signal_connect('workarea_changed', (alloc)=>
-            height = alloc.height
-            @body.style.maxHeight = "#{height}px"
-            $('#grid').style.maxHeight = "#{height-60}px"
-        )
-        DCore.signal_connect("lost_focus", (info)=>
-            if @dock.LauncherShouldExit_sync(info.xid)
-                @exit()
-        )
-        DCore.signal_connect("draw_background", (info)->
-        #     _b.style.backgroundImage = "url(#{info.path})"
-        #     if inited
-        #         DCore.Launcher.clear()
-        #     inited = true
-        )
-        DCore.signal_connect("update_items", ->
-        #     echo "update items"
-
-        #     return
-        #     applications = {}
-        #     hidden_icons = {}
-        #     category_infos = []
-        #     _category.innerHTML = ""
-        #     grid.innerHTML = ""
-
-        #     init_all_applications()
-        #     init_category_list()
-        #     init_grid()
-        #     _init_hidden_icons()
-        )
-        DCore.signal_connect("update_autostart", ->
-        )
-        @

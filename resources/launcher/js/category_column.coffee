@@ -19,7 +19,7 @@
 
 class CategoryColumn
     constructor: (@parent)->
-        echo 'init category'
+        # echo 'init category'
         @category = $("#category")
         @select_category_timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
@@ -114,6 +114,7 @@ class CategoryColumn
                 # "==" in coffee is "===" in js
                 if "" + @selected_category_id == i
                     @selected_category_id = ALL_APPLICATION_CATEGORY_ID
+                    @show_selected_category()
                 @grid.load_category(@selected_category_id)
 
     show_nonempty_category: ->

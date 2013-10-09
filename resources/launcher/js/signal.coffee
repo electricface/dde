@@ -17,3 +17,44 @@
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+connect_signals = ->
+    DCore.signal_connect('workarea_changed', (alloc)=>
+        height = alloc.height
+        document.body.style.maxHeight = "#{height}px"
+        $('#grid').style.maxHeight = "#{height-60}px"
+    )
+
+
+    DCore.signal_connect("lost_focus", (info)=>
+        if @dock.LauncherShouldExit_sync(info.xid)
+            @exit()
+    )
+
+
+    DCore.signal_connect("draw_background", (info)->
+#     _b.style.backgroundImage = "url(#{info.path})"
+#     if inited
+#         DCore.Launcher.clear()
+#     inited = true
+    )
+
+
+    DCore.signal_connect("update_items", ->
+#     echo "update items"
+
+#     return
+#     applications = {}
+#     hidden_icons = {}
+#     category_infos = []
+#     _category.innerHTML = ""
+#     grid.innerHTML = ""
+
+#     init_all_applications()
+#     init_category_list()
+#     init_grid()
+#     _init_hidden_icons()
+    )
+
+
+    DCore.signal_connect("update_autostart", ->
+    )

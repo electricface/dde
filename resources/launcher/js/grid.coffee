@@ -21,7 +21,7 @@
 
 class Grid
     constructor: (@parent)->
-        echo 'init grid'
+        # echo 'init grid'
         @apps = @parent.apps
         @grid = $('#grid')
         @item_selected = null
@@ -162,10 +162,11 @@ class Grid
             @show_item_shown(n)
 
     toggle_hidden_icons: =>
-        echo 'toggle hidden icon'
         @show_hidden_icons = !@show_hidden_icons
 
         if @show_hidden_icons
+            Item.display_temp = true
             @hidden_icons.show(@parent.category_column.selected_category_infos())
         else
+            Item.display_temp = false
             @hidden_icons.hide()

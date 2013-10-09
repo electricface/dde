@@ -19,7 +19,7 @@
 
 class HiddenIconList
     constructor: (@parent)->
-        echo 'init hidden icon list'
+        # echo 'init hidden icon list'
         @apps = @parent.apps
         @hidden_icons = {}
         @length = 0
@@ -59,10 +59,14 @@ class HiddenIconList
             if item in items
                 @hidden_icons[item].display_icon_temp()
 
+        @parent.parent.category_column.show_nonempty_category()
         return
 
     hide: ->
         for own item of @hidden_icons
             @hidden_icons[item].hide_icon()
 
+        @parent.parent.category_column.hide_empty_category()
         return
+
+    catgory_hidden_icons: (cat_id)->

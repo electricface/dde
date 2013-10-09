@@ -42,18 +42,25 @@ class Launcher
         )
 
         @body.addEventListener('keypress', (e) =>
-            if e.which != ESC_KEY
+            if e.which != ESC_KEY and not e.ctrlKey
                 @search_bar.append_value(String.fromCharCode(e.which))
                 # @search_bar.search()
         )
-
 
         # this does not work on keypress
         @body.addEventListener("keydown", do =>
             _last_val = ''
             (e) =>
-                if e.ctrlKey and e.shiftKey and e.which == TAB_KEY
-                    @container.grid.selected_up()
+                if e.which == TAB_KEY
+                    e.preventDefault()
+                    if e.shiftKey and e.ctrlKey
+                        @container.grid.selected_up()
+                    else if e.shiftKey
+                        @container.grid.selected_prev()
+                    else
+                        @container.grid.selected_next()
+                else if e.shiftKey or e.altKey
+                    return
                 else if e.ctrlKey
                     e.preventDefault()
                     switch e.which
@@ -63,9 +70,9 @@ class Launcher
                             @container.grid.selected_next()
                         when B_KEY
                             @container.grid.selected_prev()
-                        when N_KEY, TAB_KEY
+                        when N_KEY
                             @container.grid.selected_down()
-                else
+                else if not e.shiftKey and not e.altKey
                     switch e.which
                         when ESC_KEY
                             e.stopPropagation()
@@ -74,7 +81,7 @@ class Launcher
                             else
                                 @search_bar.clean()
                                 # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
-                                # grid_load_category(selected_category_id)
+                                @container.grid.load_category(@container.category_column.selected_category_id)
                         when UP_ARROW
                             @container.grid.selected_up()
                         when DOWN_ARROW
@@ -83,12 +90,6 @@ class Launcher
                             @container.grid.selected_prev()
                         when RIGHT_ARROW
                             @container.grid.selected_next()
-                        when TAB_KEY
-                            e.preventDefault()
-                            if e.shiftKey
-                                @container.grid.selected_prev()
-                            else
-                                @container.grid.selected_next()
                         when BACKSPACE_KEY
                             _last_val = s_box.value
                             s_box.value = s_box.value.substr(0, s_box.value.length-1)
@@ -98,10 +99,10 @@ class Launcher
                                 return  # to avoid to invoke search function
                             search()
                         when ENTER_KEY
-                            if item_selected
-                                item_selected.do_click()
+                            if @container.grid.item_selected
+                                @container.grid.item_selected.do_click(e)
                             else
-                                @container.grid.get_first_shown()?.do_click()
+                                @container.grid.get_first_shown()?.do_click(e)
         )
         @
 
@@ -135,5 +136,7 @@ class Launcher
         #     init_category_list()
         #     init_grid()
         #     _init_hidden_icons()
+        )
+        DCore.signal_connect("update_autostart", ->
         )
         @

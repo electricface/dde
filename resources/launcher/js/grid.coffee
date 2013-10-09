@@ -106,15 +106,14 @@ class Grid
         else
             first_item?.next_shown()
 
-    show_first_shown: ->
-        first_shown = @get_first_shown()
-        @update_selected(first_shown)
-        @item_selected.scroll_to_view()
-
     show_item_shown: (item)->
         if item
             item.scroll_to_view()
             @update_selected(item)
+
+    show_first_shown: ->
+        first_shown = @get_first_shown()
+        @show_item_shown(first_shown)
 
     selected_next: ->
         if not @item_selected
@@ -136,10 +135,14 @@ class Grid
             return
 
         n = @item_selected
-        for i in [0..get_item_row_count()-1]
-            n = n?.next_shown()
-        @show_item_shown(n)
-        @grid.scrollTop += SCROLL_STEP_LEN
+        for i in [0..@get_item_row_count()-1]
+            if n
+                n = n.next_shown()
+            else
+                break
+        if n
+            @grid.scrollTop += SCROLL_STEP_LEN
+            @show_item_shown(n)
 
     selected_up: ->
         if not @item_selected
@@ -147,7 +150,11 @@ class Grid
             return
 
         n = @item_selected
-        for i in [0..get_item_row_count()-1]
-            n = n?.prev_shown()
-        @show_item_shown(n)
-        @grid.scrollTop -= SCROLL_STEP_LEN
+        for i in [0..@get_item_row_count()-1]
+            if n
+                n = n.prev_shown()
+            else
+                break
+        if n
+            @grid.scrollTop -= SCROLL_STEP_LEN
+            @show_item_shown(n)

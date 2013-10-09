@@ -16,6 +16,7 @@
 #
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
+
 class Item extends Widget
     @theme_icon: null
     @display_temp: false
@@ -209,7 +210,7 @@ class Item extends Widget
 
     prev_shown: ->
         prev_sibling_id = @element.previousElementSibling?.id
-        if prev_sibling_id and (n = applications[prev_sibling_id])?
+        if prev_sibling_id and (n = @apps[prev_sibling_id])?
             if n.is_shown() then n else n.prev_shown()
         else
             null

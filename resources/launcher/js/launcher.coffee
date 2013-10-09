@@ -49,7 +49,7 @@ class Launcher
 
         # this does not work on keypress
         @body.addEventListener("keydown", do =>
-            _last_val = ''
+            _last_value = ''
             (e) =>
                 if e.which == TAB_KEY
                     e.preventDefault()
@@ -93,13 +93,14 @@ class Launcher
                         when RIGHT_ARROW
                             @container.grid.selected_next()
                         when BACKSPACE_KEY
-                            _last_val = s_box.value
-                            s_box.value = s_box.value.substr(0, s_box.value.length-1)
-                            if s_box.value == ""
-                                if _last_val != s_box.value
-                                    init_grid()
+                            _last_value = @search_bar.value()
+                            @search_bar.set_value(_last_value.substr(0, _last_value.length - 1))
+                            if @search_bar.empty()
+                                if not @search_bar.equal(_last_value)
+                                    1
+                                    # init_grid()
                                 return  # to avoid to invoke search function
-                            search()
+                            # search()
                         when ENTER_KEY
                             if @container.grid.item_selected
                                 @container.grid.item_selected.do_click(e)

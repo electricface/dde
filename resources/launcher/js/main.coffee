@@ -21,39 +21,8 @@
 
 
 _b = document.body
-
-# key: id of app (md5 basenam of path)
-# value: Item class
-applications = {}
-
-# key: id of app
-# value: a list of category id to which key belongs
-hidden_icons = {}
-
 is_show_hidden_icons = false
 
-exit_launcher = ->
-    # s_box.value = ""
-    # selected_category_id = ALL_APPLICATION_CATEGORY_ID
-    # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
-    # grid_load_category(selected_category_id)
-    # save_hidden_apps()
-    # _show_hidden_icons(false)
-    # get_first_shown()?.scroll_to_view()
-    if Item.hover_item_id
-        event = new Event("mouseout")
-        Widget.look_up(Item.hover_item_id).element.dispatchEvent(event)
-    DCore.Launcher.exit_gui()
-
-DCore.signal_connect('workarea_changed', (alloc)->
-    height = alloc.height
-    _b.style.maxHeight = "#{height}px"
-    $('#grid').style.maxHeight = "#{height-60}px"
-)
-DCore.signal_connect("lost_focus", (info)->
-    if @s_dock.LauncherShouldExit_sync(info.xid)
-        exit_launcher()
-)
 # inited = false
 # DCore.signal_connect("draw_background", (info)->
 #     _b.style.backgroundImage = "url(#{info.path})"
@@ -86,82 +55,6 @@ _get_hidden_icons_ids = ->
     for own id of hidden_icons
         hidden_icons_ids.push(id)
     return hidden_icons_ids
-
-
-save_hidden_apps = ->
-    DCore.Launcher.save_hidden_apps(_get_hidden_icons_ids())
-
-
-# _b.addEventListener("click", (e)->
-#     e.stopPropagation()
-#     if e.target != $("#category")
-#         exit_launcher()
-# )
-#
-#
-# _b.addEventListener('keypress', (e) ->
-#     if e.which != ESC_KEY
-#         s_box.value += String.fromCharCode(e.which)
-#         search()
-# )
-
-
-# this does not work on keypress
-# _b.addEventListener("keydown", do ->
-#     _last_val = ''
-#     (e) ->
-#         if e.ctrlKey and e.shiftKey and e.which == TAB_KEY
-#             selected_up()
-#         else if e.ctrlKey
-#             e.preventDefault()
-#             switch e.which
-#                 when P_KEY
-#                     selected_up()
-#                 when F_KEY
-#                     selected_next()
-#                 when B_KEY
-#                     selected_prev()
-#                 when N_KEY, TAB_KEY
-#                     selected_down()
-#         else
-#             switch e.which
-#                 when ESC_KEY
-#                     e.stopPropagation()
-#                     if s_box.value == ""
-#                         exit_launcher()
-#                     else
-#                         # _last_val = s_box.value
-#                         # s_box.value = ""
-#                         # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
-#                         # grid_load_category(selected_category_id)
-#                 when UP_ARROW
-#                     selected_up()
-#                 when DOWN_ARROW
-#                     selected_down()
-#                 when LEFT_ARROW
-#                     selected_prev()
-#                 when RIGHT_ARROW
-#                     selected_next()
-#                 when TAB_KEY
-#                     e.preventDefault()
-#                     if e.shiftKey
-#                         selected_prev()
-#                     else
-#                         selected_next()
-#                 when BACKSPACE_KEY
-#                     _last_val = s_box.value
-#                     s_box.value = s_box.value.substr(0, s_box.value.length-1)
-#                     if s_box.value == ""
-#                         if _last_val != s_box.value
-#                             init_grid()
-#                         return  # to avoid to invoke search function
-#                     search()
-#                 when ENTER_KEY
-#                     if item_selected
-#                         item_selected.do_click()
-#                     else
-#                         get_first_shown()?.do_click()
-# )
 
 
 _contextmenu_callback = do ->
@@ -198,12 +91,6 @@ _show_hidden_icons = (is_shown) ->
 
     _b.addEventListener("contextmenu", _contextmenu_callback(msg,
         SORT_MESSAGE[sort_method]))
-
-
-compare_string = (s1, s2) ->
-    return 1 if s1 > s2
-    return 0 if s1 == s2
-    return -1
 
 
 init_all_applications = ->

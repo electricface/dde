@@ -44,7 +44,7 @@ class Grid
         return items
 
     update_scroll_bar: (len) ->
-        echo "items length: #{len}"
+        # echo "items length: #{len}"
         ratio_row_number = ITEM_WIDTH * len / @grid.clientWidth
         row_number = Math.floor(ratio_row_number)
         if ratio_row_number != row_number

@@ -49,3 +49,12 @@ class SearchBar
 
     empty: ->
         @s_box.value == ""
+
+    length: ->
+        @s_box.length
+
+    value: ->
+        @s_box.value
+
+    equal: (value)->
+        @s_box.value == value

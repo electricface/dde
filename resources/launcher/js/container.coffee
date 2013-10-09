@@ -17,6 +17,12 @@
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+compare_string = (s1, s2) ->
+    return 1 if s1 > s2
+    return 0 if s1 == s2
+    return -1
+
+
 get_name_by_id = (id) ->
     if Widget.look_up(id)?
         DCore.DEntry.get_name(Widget.look_up(id).core)
@@ -98,6 +104,8 @@ class Container
         @s_dock = @parent.s_dock
 
         all_items = DCore.Launcher.get_items_by_category(ALL_APPLICATION_CATEGORY_ID)
+        # key: id of app (md5 basenam of path)
+        # value: Item class
         @apps = []
         @grid = new Grid(@)
         @category_column = new CategoryColumn(@)

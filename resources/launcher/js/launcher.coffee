@@ -57,6 +57,8 @@ class Launcher
                         @container.grid.selected_up()
                     else if e.shiftKey
                         @container.grid.selected_prev()
+                    else if e.ctrlKey
+                        @container.grid.selected_down()
                     else
                         @container.grid.selected_next()
                 else if e.shiftKey or e.altKey

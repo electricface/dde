@@ -28,6 +28,8 @@ class Grid
         @hover_item_id = null
         @hidden_icons = new HiddenIconList(@)
 
+        @show_hidden_icons = false
+
     reset: ->
         @get_first_shown()?.scroll_to_view()
         @hidden_icons.save()
@@ -158,3 +160,12 @@ class Grid
         if n
             @grid.scrollTop -= SCROLL_STEP_LEN
             @show_item_shown(n)
+
+    toggle_hidden_icons: =>
+        echo 'toggle hidden icon'
+        @show_hidden_icons = !@show_hidden_icons
+
+        if @show_hidden_icons
+            @hidden_icons.show(@parent.category_column.selected_category_infos())
+        else
+            @hidden_icons.hide()

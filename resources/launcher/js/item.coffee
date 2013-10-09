@@ -28,6 +28,7 @@ class Item extends Widget
         @apps = @parent.apps
         @hidden_icons = @grid.hidden_icons
         @category_column = @parent.category_column
+        @launcher = @parent.parent
 
         @name = create_element("div", "item_name", @element)
         @name.innerText = DCore.DEntry.get_name(@core)
@@ -40,6 +41,8 @@ class Item extends Widget
 
         if DCore.Launcher.is_autostart(@core)
             @add_to_autostart()
+        else
+            @is_autostart = false
 
         @element.addEventListener("contextmenu", Item._contextmenu_callback(@))
 
@@ -93,25 +96,16 @@ class Item extends Widget
             @add_to_autostart()
 
     _menu: ->
-        if @display_mode == 'display'
-            hide_icon_msg = HIDE_ICON
-        else
-            hide_icon_msg = DISPLAY_ICON
-
-        if @is_autostart
-            startup_msg = NOT_STARTUP_ICON
-        else
-            startup_msg = STARTUP_ICON
-
+        echo AUTOSTARTUP_MESSAGE[@is_autostart]
         menu = [
             [1, _("_Open")],
             [],
-            [2, hide_icon_msg],
+            [2, ITEM_HIDDEN_ICON_MESSAGE[@display_mode]],
             [],
             [3, _("Send to d_esktop"), not DCore.Launcher.has_this_item_on_desktop(@core)],
-            [4, _("Send to do_ck"), @parent.s_dock!=null],
+            [4, _("Send to do_ck"), @parent.dock!=null],
             [],
-            [5, startup_msg]
+            [5, AUTOSTARTUP_MESSAGE[@is_autostart]]
         ]
 
         if DCore.DEntry.internal()
@@ -133,7 +127,7 @@ class Item extends Widget
         DCore.DEntry.launch(@core, [])
         @grid.hover_item_id = @id
         @element.style.cursor = 'auto'
-        exit_launcher()
+        @launcher.exit()
 
     do_dragstart: (e)=>
         e.dataTransfer.setData("text/uri-list", DCore.DEntry.get_uri(@core))
@@ -183,7 +177,7 @@ class Item extends Widget
             when 1 then DCore.DEntry.launch(@core, [])
             when 2 then @toggle_icon()
             when 3 then DCore.DEntry.copy_dereference_symlink([@core], DCore.Launcher.get_desktop_entry())
-            when 4 then @parent.s_dock.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
+            when 4 then @parent.dock?.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
             when 5 then @toggle_autostart()
             when 100 then DCore.DEntry.report_bad_icon(@core)  # internal
 

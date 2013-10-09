@@ -17,24 +17,6 @@
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-s_box = $('#s_box')
-
-init_search_box = ->
-    s_box.setAttribute("placeholder", _("Type to search..."))
-
-    $("#search").addEventListener('click', (e)->
-        if e.target == s_box
-            e.stopPropagation()
-    )
-
-    s_box.addEventListener('input', ->
-        s_box.blur()
-    )
-
-    DCore.signal_connect("im_commit", (info)->
-        s_box.value += info.Content
-        search()
-    )
 
 do_search = ->
     ret = []

@@ -22,9 +22,9 @@ class Launcher
         echo 'init launcher'
         @body = document.body
         try
-            @s_dock = DCore.DBus.session("com.deepin.dde.dock")
+            @dock = DCore.DBus.session("com.deepin.dde.dock")
         catch error
-            @s_dock = null
+            @dock = null
 
         @search_bar = new SearchBar(@)
         @container = new Container(@)
@@ -116,7 +116,7 @@ class Launcher
             $('#grid').style.maxHeight = "#{height-60}px"
         )
         DCore.signal_connect("lost_focus", (info)=>
-            if @s_dock.LauncherShouldExit_sync(info.xid)
+            if @dock.LauncherShouldExit_sync(info.xid)
                 @exit()
         )
         DCore.signal_connect("draw_background", (info)->

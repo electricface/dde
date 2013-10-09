@@ -130,3 +130,6 @@ class CategoryColumn
             clearTimeout(@select_category_timeout_id)
             @select_category_timeout_id = null
         @show_selected_category()
+
+    selected_category_infos: ->
+        @category_infos[@selected_category_id]

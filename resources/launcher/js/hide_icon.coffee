@@ -59,6 +59,10 @@ class HiddenIconList
             if item in items
                 @hidden_icons[item].display_icon_temp()
 
+        return
+
     hide: ->
         for own item of @hidden_icons
             @hidden_icons[item].hide_icon()
+
+        return

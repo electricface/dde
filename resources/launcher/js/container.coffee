@@ -101,9 +101,11 @@ class Container
         @search_bar = @parent.search_bar
 
         @config = new Config(@)
-        @s_dock = @parent.s_dock
+        @dock = @parent.dock
+        @body = @parent.body
 
         all_items = DCore.Launcher.get_items_by_category(ALL_APPLICATION_CATEGORY_ID)
+
         # key: id of app (md5 basenam of path)
         # value: Item class
         @apps = []
@@ -121,6 +123,37 @@ class Container
         @grid.hidden_icons.load()
         @grid.hidden_icons.hide()
 
+        @body.addEventListener("contextmenu", Container.contextmenu_callback(@))
+        @body.addEventListener("itemselected", (e)=>
+            switch e.id
+                when 1
+                    if @config.sort_method_name == "name"
+                        @config.sort_method_name = "rate"
+                    else
+                        @config.sort_method_name = "name"
+                    @config.save()
+
+                when 2
+                    @grid.load_category(@category_column.selected_category_id)
+                    @grid.toggle_hidden_icons()
+
+            @body.addEventListener("contextmenu", Container.contextmenu_callback(@))
+        )
+
     reset: ->
         @grid.reset()
         @category_column.reset()
+
+    _menu: ->
+        menu = [
+            [1, SORT_MESSAGE[@config.sort_method_name]],
+            [2, HIDDEN_ICON_MESSAGE[@grid.show_hidden_icons]]
+        ]
+
+    @contextmenu_callback: do ->
+        func_handle = null
+        (item)->
+            item.body.removeEventListener('contextmenu', func_handle)
+            func_handle = (e) ->
+                item.body.contextMenu = build_menu(item._menu())
+

@@ -1,3 +1,21 @@
+#Copyright (c) 2011 ~ 2013 Deepin, Inc.
+#              2013 ~ 2013 Liqiang Lee
+#
+#Author:      Liqiang Lee <liliqiang@linuxdeepin.com>
+#Maintainer:  Liqiang Lee <liliqiang@linuxdeepin.com>
+#
+#This program is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 3 of the License, or
+#(at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, see <http://www.gnu.org/licenses/>.
 class Item extends Widget
     @theme_icon: null
     @display_temp: false
@@ -6,7 +24,9 @@ class Item extends Widget
         super
         @load_img()
         @grid = @parent.grid
+        @apps = @parent.apps
         @hidden_icons = @grid.hidden_icons
+        @category_column = @parent.category_column
 
         @name = create_element("div", "item_name", @element)
         @name.innerText = DCore.DEntry.get_name(@core)
@@ -127,8 +147,7 @@ class Item extends Widget
             @element.style.display = 'none'
             Item.display_temp = false
         @hidden_icons.add(@)
-        # hidden_icons[@id] = @
-        # hide_category()
+        @category_column.hide_empty_category()
         # _update_scroll_bar(category_infos[selected_category_id].length - _get_hidden_icons_ids().length)
 
     display_icon: (e)=>
@@ -137,9 +156,8 @@ class Item extends Widget
         if HIDE_ICON_CLASS in @element.classList
             @remove_css_class(HIDE_ICON_CLASS, @element)
         @hidden_icons.remove(@)
-        # delete hidden_icons[@id]
+        @category_column.show_nonempty_category()
         # hidden_icons_num = _get_hidden_icons_ids().length
-        # show_category()
         # if hidden_icons_num == 0
         #     is_show_hidden_icons = false
         #     _show_hidden_icons(is_show_hidden_icons)
@@ -148,7 +166,7 @@ class Item extends Widget
     display_icon_temp: ->
         @element.style.display = 'block'
         Item.display_temp = true
-        show_category()
+        @category_column.show_nonempty_category()
         # _update_scroll_bar(category_infos[selected_category_id].length)
 
     toggle_icon: ->
@@ -184,16 +202,14 @@ class Item extends Widget
 
     next_shown: ->
         next_sibling_id = @element.nextElementSibling?.id
-        if next_sibling_id
-            n = applications[next_sibling_id]
+        if next_sibling_id and (n = @apps[next_sibling_id])?
             if n.is_shown() then n else n.next_shown()
         else
             null
 
     prev_shown: ->
         prev_sibling_id = @element.previousElementSibling?.id
-        if prev_sibling_id
-            n = applications[prev_sibling_id]
+        if prev_sibling_id and (n = applications[prev_sibling_id])?
             if n.is_shown() then n else n.prev_shown()
         else
             null

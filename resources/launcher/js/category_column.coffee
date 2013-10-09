@@ -1,8 +1,8 @@
 #Copyright (c) 2011 ~ 2013 Deepin, Inc.
-#              2011 ~ 2013 liliqiang
+#              2013 ~ 2013 Liqiang Lee
 #
-#Author:      liliqiang <liliqiang@linuxdeepin.com>
-#Maintainer:  liliqiang <liliqiang@liunxdeepin.com>
+#Author:      Liqiang Lee <liliqiang@linuxdeepin.com>
+#Maintainer:  Liqiang Lee <liliqiang@liunxdeepin.com>
 #
 #This program is free software; you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
@@ -32,11 +32,12 @@ class CategoryColumn
         # value: a list of Item's id which is in category
         @category_infos = []
 
+    load: ->
         frag = document.createDocumentFragment()
         for info in DCore.Launcher.get_categories()
             c = @create_category(info)
             frag.appendChild(c)
-            @load_category_infos(@grid.grid, info.ID, @config.sort_method())
+            @load_category_infos(info.ID, @config.sort_method())
 
         @category.appendChild(frag)
 
@@ -71,14 +72,14 @@ class CategoryColumn
         )
         return el
 
-    load_category_infos: (grid, cat_id, sort_func)->
+    load_category_infos: (cat_id, sort_func)->
         if cat_id == ALL_APPLICATION_CATEGORY_ID
             frag = document.createDocumentFragment()
             @category_infos[cat_id] = []
             for own key, value of @apps
                 frag.appendChild(value.element)
                 @category_infos[cat_id].push(key)
-            grid.appendChild(frag)
+            @grid.grid.appendChild(frag)
         else
             info = DCore.Launcher.get_items_by_category(cat_id)
             @category_infos[cat_id] = info
@@ -104,7 +105,7 @@ class CategoryColumn
 
     hide_empty_category: ->
         for own i of @category_infos
-            all_is_hidden = @category_infos["#{i}"].every((el, idx, arr) ->
+            all_is_hidden = @category_infos["#{i}"].every((el, idx, arr) =>
                 @apps[el].display_mode == "hidden"
             )
             if all_is_hidden and not Item.display_temp
@@ -116,6 +117,12 @@ class CategoryColumn
                 @grid.load_category(@selected_category_id)
 
     show_nonempty_category: ->
+        for own i of @category_infos
+            not_all_is_hidden = @category_infos["#{i}"].some((el, idx, arr) =>
+                @apps[el].display_mode != "hidden"
+            )
+            if not_all_is_hidden or Item.display_temp
+                $("##{i}").style.display = "block"
 
     reset: ->
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID

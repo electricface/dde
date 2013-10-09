@@ -1,8 +1,8 @@
 #Copyright (c) 2011 ~ 2013 Deepin, Inc.
-#              2011 ~ 2013 liliqiang
+#              2013 ~ 2013 Liqiang Lee
 #
-#Author:      liliqiang <liliqiang@linuxdeepin.com>
-#Maintainer:  liliqiang <liliqiang@liunxdeepin.com>
+#Author:      Liqiang Lee <liliqiang@linuxdeepin.com>
+#Maintainer:  Liqiang Lee <liliqiang@liunxdeepin.com>
 #
 #This program is free software; you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
@@ -43,6 +43,9 @@ class SearchBar
 
     set_value: (value) ->
         @s_box.value = value
+
+    append_value: (s) ->
+        @set_value(@s_box.value + s)
 
     empty: ->
         @s_box.value == ""

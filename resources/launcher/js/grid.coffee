@@ -1,10 +1,10 @@
-#Copyright (c) 2011 ~ 2012 Deepin, Inc.
+#Copyright (c) 2011 ~ 2013 Deepin, Inc.
 #              2011 ~ 2012 snyh
-#              2011 ~ 2013 liliqiang
+#              2013 ~ 2013 Liqiang Lee
 #
 #Author:      snyh <snyh@snyh.org>
 #Maintainer:  snyh <snyh@snyh.org>
-#             liliqiang <liliqiang@linuxdeepin.com>
+#             Liqiang Lee <liliqiang@linuxdeepin.com>
 #
 #This program is free software; you can redistribute it and/or modify
 #it under the terms of the GNU General Public License as published by
@@ -101,10 +101,10 @@ class Grid
 
     get_first_shown: ->
         first_item = @apps[$(".item").id]
-        if first_item.is_shown()
+        if first_item?.is_shown()
             first_item
         else
-            first_item.next_shown()
+            first_item?.next_shown()
 
     show_first_shown: ->
         first_shown = @get_first_shown()

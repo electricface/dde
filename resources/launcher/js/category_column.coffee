@@ -52,6 +52,10 @@ class CategoryColumn
         el.setAttribute('id', info.ID)
         el.innerText = info.Name
 
+        el.addEventListener('contextmenu', (e)->
+            e.preventDefault()
+            e.stopPropagation()
+        )
         el.addEventListener('click', (e) ->
             e.stopPropagation()
         )

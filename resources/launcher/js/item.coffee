@@ -81,7 +81,9 @@ class Item extends Widget
         DCore.Launcher.add_to_autostart(@core)
         Item.theme_icon ?= DCore.get_theme_icon(AUTOSTART_ICON_NAME,
             AUTOSTART_ICON_SIZE)
-        create_img("autostart_flag", Item.theme_icon, @element)
+        last = @element.lastChild
+        if last.tagName != 'IMG'
+            create_img("autostart_flag", Item.theme_icon, @element)
 
     remove_from_autostart: ->
         if DCore.Launcher.remove_from_autostart(@core)

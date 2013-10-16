@@ -47,12 +47,19 @@ class Grid
 
     update_scroll_bar: (len) ->
         # echo "items length: #{len}"
+        lang = document.body.getAttribute('lang')
+        if lang == 'en'
+            category_width = 220
+        else
+            category_width = 180
+        grid_width = window.screen.width - 20 - category_width
+
         ratio_row_number = ITEM_WIDTH * len / @grid.clientWidth
         row_number = Math.floor(ratio_row_number)
         if ratio_row_number != row_number
             row_number += 1
 
-        if row_number * ITEM_HEIGHT >= @grid.clientHeight
+        if row_number * ITEM_HEIGHT >= grid_width
             @grid.style.overflowY = "scroll"
         else
             @grid.style.overflowY = "hidden"

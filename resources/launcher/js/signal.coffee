@@ -18,16 +18,18 @@
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 connect_signals = ->
-    DCore.signal_connect('workarea_changed', (alloc)=>
+    DCore.signal_connect('workarea_changed', (alloc)->
         height = alloc.height
         document.body.style.maxHeight = "#{height}px"
         $('#grid').style.maxHeight = "#{height-60}px"
+        # echo 'category column adaptive height'
+        launcher?.container.category_column.adaptive_height()
     )
 
 
     DCore.signal_connect("lost_focus", (info)=>
-        if @dock.LauncherShouldExit_sync(info.xid)
-            @exit()
+        if launcher.dock.LauncherShouldExit_sync(info.xid)
+            launcher.exit()
     )
 
 

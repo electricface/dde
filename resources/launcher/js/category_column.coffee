@@ -41,7 +41,7 @@ class CategoryColumn
 
         @category.appendChild(frag)
 
-        @set_adaptive_height()
+        @adaptive_height()
         @show_selected_category()
 
     create_category: (info) ->
@@ -90,11 +90,14 @@ class CategoryColumn
 
         sort_func(@category_infos[cat_id])
 
-    set_adaptive_height: ->
+    adaptive_height: ->
         warp = @category.parentNode
         # add 20px for margin
         categories_height = @category.children.length * (@category.lastElementChild.clientHeight + 20)
-        if categories_height > warp.clientHeight
+        # 47 + 20
+        warp_height = window.screen.height - 100
+        # echo "categories_height: #{categories_height}, warp_height: #{warp_height}"
+        if categories_height > warp_height
             warp.style.overflowY = "scroll"
             warp.style.marginBottom = "#{GRID_MARGIN_BOTTOM}px"
 

@@ -42,7 +42,7 @@ class Launcher
         )
 
         @body.addEventListener('keypress', (e) =>
-            if e.which != ESC_KEY and not e.ctrlKey
+            if e.which != ESC_KEY and not e.ctrlKey and e.which != BACKSPACE_KEY
                 @search_bar.append_value(String.fromCharCode(e.which))
                 # @search_bar.search()
         )
@@ -84,15 +84,9 @@ class Launcher
                                 @search_bar.clean()
                                 # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
                                 @container.grid.load_category(@container.category_column.selected_category_id)
-                        when UP_ARROW
-                            @container.grid.selected_up()
-                        when DOWN_ARROW
-                            @container.grid.selected_down()
-                        when LEFT_ARROW
-                            @container.grid.selected_prev()
-                        when RIGHT_ARROW
-                            @container.grid.selected_next()
                         when BACKSPACE_KEY
+                            e.stopPropagation()
+                            e.preventDefault()
                             _last_value = @search_bar.value()
                             @search_bar.set_value(_last_value.substr(0, _last_value.length - 1))
                             if @search_bar.empty()
@@ -106,4 +100,12 @@ class Launcher
                                 @container.grid.item_selected.do_click(e)
                             else
                                 @container.grid.get_first_shown()?.do_click(e)
+                        when UP_ARROW
+                            @container.grid.selected_up()
+                        when DOWN_ARROW
+                            @container.grid.selected_down()
+                        when LEFT_ARROW
+                            @container.grid.selected_prev()
+                        when RIGHT_ARROW
+                            @container.grid.selected_next()
         )

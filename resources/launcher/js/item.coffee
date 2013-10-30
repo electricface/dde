@@ -157,6 +157,8 @@ class Item extends Widget
             @remove_css_class(HIDE_ICON_CLASS, @element)
 
         @hidden_icons.remove(@)
+        if @hidden_icons.length == 0
+            Item.display_temp = false
 
     display_icon_temp: ->
         @element.style.display = 'block'

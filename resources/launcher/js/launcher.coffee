@@ -43,7 +43,7 @@ class Launcher
         @body.addEventListener('keypress', (e) =>
             if e.which != ESC_KEY and not e.ctrlKey and e.which != BACKSPACE_KEY
                 @search_bar.append_value(String.fromCharCode(e.which))
-                # @search_bar.search()
+                search()
         )
 
         # this does not work on keypress
@@ -89,11 +89,9 @@ class Launcher
                             _last_value = @search_bar.value()
                             @search_bar.set_value(_last_value.substr(0, _last_value.length - 1))
                             if @search_bar.empty()
-                                if not @search_bar.equal(_last_value)
-                                    1
-                                    # init_grid()
+                                @container.reset()
                                 return  # to avoid to invoke search function
-                            # search()
+                            search()
                         when ENTER_KEY
                             if @container.grid.item_selected
                                 @container.grid.item_selected.do_click(e)

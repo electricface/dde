@@ -34,6 +34,10 @@ class Container
         @grid = new Grid(@)
         @category_column = new CategoryColumn(@)
 
+        @search_bar.connect(
+            grid:
+                @grid
+        )
         @grid.connect(
             category_column:
                 @category_column
@@ -75,10 +79,12 @@ class Container
         @category_column.reset()
 
     _menu: ->
-        menu = [
-            [1, SORT_MESSAGE[@config.sort_method_name]],
-            [2, HIDDEN_ICON_MESSAGE[@grid.show_hidden_icons]]
-        ]
+        menu = [[1, SORT_MESSAGE[@config.sort_method_name]]]
+
+        if @grid.hidden_icons.length > 0
+            menu.push([2, HIDDEN_ICON_MESSAGE[@grid.show_hidden_icons]])
+
+        menu
 
     @contextmenu_callback: do ->
         func_handle = null

@@ -38,6 +38,10 @@ class SearchBar
         cursor = create_element("span", "cursor", document.body)
         cursor.innerText = "|"
 
+    connect: (obj) ->
+        for own name, value of obj
+            @[name] = value
+
     clean: ->
         @s_box.value = ""
 
@@ -58,3 +62,33 @@ class SearchBar
 
     equal: (value)->
         @s_box.value == value
+
+
+do_search = ->
+    ret = []
+    key = launcher.search_bar.value().toLowerCase().trim()
+
+    for k,v of launcher.container.apps
+        if key == ""
+            ret.push(
+                "value": k
+                "weight": 0
+            )
+        else if (weight = DCore.Launcher.weight(v.core, key))
+            ret.push(
+                "value": k
+                "weight": weight
+            )
+
+    ret.sort((lhs, rhs) -> rhs.weight - lhs.weight)
+    ret = (item.value for item in ret)
+
+    return launcher.container.grid.render_dom(ret)
+
+search = do ->
+    _search_id = null
+    ->
+        clearTimeout(_search_id)
+        _search_id = setTimeout(->
+            launcher.container.grid.show_items(launcher.container.grid.render_dom(do_search()))
+        , 20)

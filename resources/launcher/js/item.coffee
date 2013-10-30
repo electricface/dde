@@ -98,7 +98,7 @@ class Item extends Widget
             @add_to_autostart()
 
     _menu: ->
-        echo AUTOSTARTUP_MESSAGE[@is_autostart]
+        # echo AUTOSTARTUP_MESSAGE[@is_autostart]
         menu = [
             [1, _("_Open")],
             [],
@@ -144,9 +144,10 @@ class Item extends Widget
 
         if not Item.display_temp and not @grid.show_hidden_icons
             @element.style.display = 'none'
+            @grid.update_scroll_bar(@category_column.selected_category_infos.length )#- hidden_icons_num)
+            # @category_column.hide_empty_category()
 
         @hidden_icons.add(@)
-        # @grid.update_scroll_bar(@category_column.selected_category_infos.length - hidden_icons_num)
 
     display_icon: (e)=>
         @display_mode = 'display'

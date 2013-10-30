@@ -30,6 +30,11 @@ class Grid
 
         @show_hidden_icons = false
 
+    connect: (obj)->
+        for own name, value of obj
+            @[name] = value
+        @hidden_icons.connect(obj)
+
     reset: ->
         @get_first_shown()?.scroll_to_view()
         @hidden_icons.save()
@@ -39,7 +44,7 @@ class Grid
             event = new Event("mouseout")
             Widget.look_up(@hover_item_id).element.dispatchEvent(event)
 
-    render: (items) ->
+    render_dom: (items) ->
         for id in items
             item_to_be_shown = @grid.removeChild($("#"+id))
             @grid.appendChild(item_to_be_shown)
@@ -52,19 +57,17 @@ class Grid
             category_width = 220
         else
             category_width = 180
+
         grid_width = window.screen.width - 20 - category_width
-
-        ratio_row_number = ITEM_WIDTH * len / @grid.clientWidth
-        row_number = Math.floor(ratio_row_number)
-        if ratio_row_number != row_number
-            row_number += 1
-
-        if row_number * ITEM_HEIGHT >= grid_width
+        row_number = Math.ceil(ITEM_WIDTH * len / grid_width)
+        grid_height = window.screen.height - 100
+        if row_number * ITEM_HEIGHT >= grid_height
             @grid.style.overflowY = "scroll"
         else
             @grid.style.overflowY = "hidden"
 
     show_items: (items) ->
+        # echo 'show_items'
         @update_selected(null)
 
         count = 0
@@ -90,7 +93,7 @@ class Grid
 
     init_grid: ->
         sort_category_info(sort_methods[sort_method])
-        @render(@parent.category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
+        @render_dom(@parent.category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
         @load_category(ALL_APPLICATION_CATEGORY_ID)
 
     show_grid_dom_child: ->
@@ -173,7 +176,9 @@ class Grid
 
         if @show_hidden_icons
             Item.display_temp = true
-            @hidden_icons.show(@parent.category_column.selected_category_infos())
+            @hidden_icons.show(@category_column.selected_category_infos())
         else
             Item.display_temp = false
             @hidden_icons.hide()
+
+        @grid.update_scroll_bar(@category_column.category_infos[cat_id].length)

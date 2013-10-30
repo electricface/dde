@@ -76,10 +76,9 @@ DCore.signal_connect("autostart-update", (info)->
 )
 
 launcher = new Launcher()
+launcher.bind_events()
 
 connect_signals()
 DCore.Launcher.notify_workarea_size()
-
-launcher.bind_events()
 DCore.Launcher.webview_ok()
 DCore.Launcher.test()

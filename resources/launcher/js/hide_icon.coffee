@@ -20,9 +20,14 @@
 class HiddenIconList
     constructor: (@parent)->
         # echo 'init hidden icon list'
+        @grid = @parent
         @apps = @parent.apps
         @hidden_icons = {}
         @length = 0
+
+    connect: (obj)->
+        for own name, value of obj
+            @[name] = value
 
     load: ->
         hidden_icon_ids = DCore.Launcher.load_hidden_apps()
@@ -34,7 +39,7 @@ class HiddenIconList
             DCore.Launcher.save_hidden_apps(hidden_icon_ids)
             for id in hidden_icon_ids
                 if @apps[id]
-                    @add(@apps[id]).hide_icon()
+                    @add(@apps[id])
 
     add: (item)->
         @hidden_icons[item.id] = item
@@ -59,14 +64,18 @@ class HiddenIconList
             if item in items
                 @hidden_icons[item].display_icon_temp()
 
-        @parent.parent.category_column.show_nonempty_category()
+        @category_column.show_nonempty_category()
+        len = @category_column.selected_category_infos().length
+        @grid.update_scroll_bar(len)
         return
 
     hide: ->
         for own item of @hidden_icons
             @hidden_icons[item].hide_icon()
 
-        @parent.parent.category_column.hide_empty_category()
+        @category_column.hide_empty_category()
+        len = @category_column.selected_category_infos().length
+        @grid.update_scroll_bar(len)
         return
 
     catgory_hidden_icons: (cat_id)->

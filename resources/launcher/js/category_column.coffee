@@ -24,13 +24,16 @@ class CategoryColumn
         @select_category_timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
         @s_box = @parent.parent.search_bar
-        @grid = @parent.grid
         @config = @parent.config
         @apps = @parent.apps
 
         # key: category id
         # value: a list of Item's id which is in category
         @category_infos = []
+
+    connect: (obj)->
+        for own name, value of obj
+            @[name] = value
 
     load: ->
         frag = document.createDocumentFragment()

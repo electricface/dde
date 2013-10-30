@@ -112,14 +112,23 @@ class Container
         @grid = new Grid(@)
         @category_column = new CategoryColumn(@)
 
+        @grid.connect(
+            category_column:
+                @category_column
+        )
+        @category_column.connect(
+            grid:
+                @grid
+        )
+
         for core in all_items
             id = DCore.DEntry.get_id(core)
             @apps[id] = new Item(id, core, @)
 
         @category_column.load()
 
-        @grid.render(@category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
-        @grid.load_category(ALL_APPLICATION_CATEGORY_ID)
+        @grid.render_dom(@category_column.selected_category_infos())
+        @grid.load_category(@category_column.selected_category_id)
         @grid.hidden_icons.load()
         @grid.hidden_icons.hide()
 
@@ -132,7 +141,6 @@ class Container
                     else
                         @config.sort_method_name = "name"
                     @config.save()
-
                 when 2
                     @grid.load_category(@category_column.selected_category_id)
                     @grid.toggle_hidden_icons()

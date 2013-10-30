@@ -32,13 +32,12 @@ class Launcher
     exit: ->
         @search_bar.clean()
         @container.reset()
-        DCore.Launcher.exit_gui()
 
     bind_events: ->
         @body.addEventListener("click", (e)=>
             e.stopPropagation()
             if e.target != $("#category")
-                @exit()
+                DCore.Launcher.exit_gui()
         )
 
         @body.addEventListener('keypress', (e) =>
@@ -79,7 +78,7 @@ class Launcher
                         when ESC_KEY
                             e.stopPropagation()
                             if @search_bar.empty()
-                                @exit()
+                                DCore.Launcher.exit_gui()
                             else
                                 @search_bar.clean()
                                 # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])

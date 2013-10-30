@@ -60,3 +60,7 @@ connect_signals = ->
 
     DCore.signal_connect("update_autostart", ->
     )
+
+    DCore.signal_connect("exit_launcher", ->
+        launcher.exit()
+    )

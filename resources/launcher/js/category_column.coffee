@@ -97,9 +97,7 @@ class CategoryColumn
         warp = @category.parentNode
         # add 20px for margin
         categories_height = @category.children.length * (@category.lastElementChild.clientHeight + 20)
-        # 47 + 20
         warp_height = window.screen.height - 100
-        # echo "categories_height: #{categories_height}, warp_height: #{warp_height}"
         if categories_height > warp_height
             warp.style.overflowY = "scroll"
             warp.style.marginBottom = "#{GRID_MARGIN_BOTTOM}px"
@@ -126,6 +124,7 @@ class CategoryColumn
                     @selected_category_id = ALL_APPLICATION_CATEGORY_ID
                     @show_selected_category()
                 @grid.load_category(@selected_category_id)
+        return
 
     show_nonempty_category: ->
         for own i of @category_infos
@@ -134,6 +133,7 @@ class CategoryColumn
             )
             if not_all_is_hidden or Item.display_temp
                 $("##{i}").style.display = "block"
+        return
 
     reset: ->
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID

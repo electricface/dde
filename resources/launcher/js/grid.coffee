@@ -85,7 +85,7 @@ class Grid
             group_num = parseInt(count++ / NUM_SHOWN_ONCE)
             setTimeout(@apps[id].show, 4 + group_num)
 
-        return  # some return like here will keep js converted by coffeescript returning stupid things
+        return  # some return like here will stop js returning stupid things
 
     load_category: (cat_id) ->
         @show_items(@parent.category_column.category_infos[cat_id])
@@ -181,4 +181,4 @@ class Grid
             Item.display_temp = false
             @hidden_icons.hide()
 
-        @grid.update_scroll_bar(@category_column.category_infos[cat_id].length)
+        @update_scroll_bar(@category_column.selected_category_infos().length)

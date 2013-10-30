@@ -29,15 +29,12 @@ connect_signals = ->
 
     DCore.signal_connect("lost_focus", (info)=>
         if launcher.dock.LauncherShouldExit_sync(info.xid)
-            launcher.exit()
+            DCore.Launcher.exit_gui()
     )
 
 
     DCore.signal_connect("draw_background", (info)->
 #     _b.style.backgroundImage = "url(#{info.path})"
-#     if inited
-#         DCore.Launcher.clear()
-#     inited = true
     )
 
 
@@ -59,8 +56,39 @@ connect_signals = ->
 
 
     DCore.signal_connect("update_autostart", ->
+        if (app = Widget.look_up(info.id))?
+            if DCore.Launcher.is_autostart(app.core)
+                # echo 'add'
+                app.add_to_autostart()
+            else
+                # echo 'delete'
+                app.remove_from_autostart()
     )
 
     DCore.signal_connect("exit_launcher", ->
         launcher.exit()
     )
+
+###
+reset = ->
+    s_box.value = ""
+    selected_category_id = ALL_APPLICATION_CATEGORY_ID
+    # if s_box.value != ""
+    #     sort_category_info(sort_methods[sort_method])
+    update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
+    grid_load_category(selected_category_id)
+    save_hidden_apps()
+    _show_hidden_icons(false)
+    get_first_shown()?.scroll_to_view()
+    if Item.hover_item_id
+        event = new Event("mouseout")
+        Widget.look_up(Item.hover_item_id).element.dispatchEvent(event)
+
+exit_launcher = ->
+    DCore.Launcher.exit_gui()
+
+DCore.signal_connect("exit_launcher", ->
+    reset()
+)
+###
+

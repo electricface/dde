@@ -144,8 +144,8 @@ class Item extends Widget
 
         if not Item.display_temp and not @grid.show_hidden_icons
             @element.style.display = 'none'
-            @grid.update_scroll_bar(@category_column.selected_category_infos.length )#- hidden_icons_num)
-            # @category_column.hide_empty_category()
+            @grid.update_scroll_bar(@category_column.selected_category_infos().length )#- hidden_icons_num)
+            @category_column.hide_empty_category()
 
         @hidden_icons.add(@)
 
@@ -157,11 +157,6 @@ class Item extends Widget
             @remove_css_class(HIDE_ICON_CLASS, @element)
 
         @hidden_icons.remove(@)
-        # hidden_icons_num = _get_hidden_icons_ids().length
-        # if hidden_icons_num == 0
-        #     is_show_hidden_icons = false
-        #     _show_hidden_icons(is_show_hidden_icons)
-        # @grid.update_scroll_bar(@category_column.selected_category_infos.length - hidden_icons_num)
 
     display_icon_temp: ->
         @element.style.display = 'block'
@@ -225,3 +220,62 @@ class Item extends Widget
         @element.style.background = ''
         @element.style.border = "1px rgba(255, 255, 255, 0.0) solid"
         @element.style.borderRadius = ""
+
+
+compare_string = (s1, s2) ->
+    return 1 if s1 > s2
+    return 0 if s1 == s2
+    return -1
+
+
+get_name_by_id = (id) ->
+    if Widget.look_up(id)?
+        DCore.DEntry.get_name(Widget.look_up(id).core)
+    else
+        ""
+
+
+sort_by_name = (items)->
+    items.sort((lhs, rhs)->
+        lhs_name = get_name_by_id(lhs)
+        rhs_name = get_name_by_id(rhs)
+        compare_string(lhs_name, rhs_name)
+    )
+
+
+sort_by_rate = do ->
+    rates = null
+    items_name_map = {}
+
+    (items, update)->
+        if update
+            rates = DCore.Launcher.get_app_rate()
+
+            items_name_map = {}
+            for id in category_infos[ALL_APPLICATION_CATEGORY_ID]
+                if not items_name_map[id]?
+                    items_name_map[id] =
+                        DCore.DEntry.get_appid(Widget.look_up(id).core)
+
+        items.sort((lhs, rhs)->
+            lhs_appid = items_name_map[lhs]
+            lhs_rate = rates[lhs_appid] if lhs_appid?
+
+            rhs_appid = items_name_map[rhs]
+            rhs_rate = rates[rhs_appid] if rhs_appid?
+
+            if lhs_rate? and rhs_rate?
+                rates_delta = rhs_rate - lhs_rate
+                if rates_delta == 0
+                    return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
+                else
+                    return rates_delta
+            else if lhs_rate? and not rhs_rate?
+                return -1
+            else if not lhs_rate? and rhs_rates?
+                return 1
+            else
+                return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
+        )
+
+

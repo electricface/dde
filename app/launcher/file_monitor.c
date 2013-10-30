@@ -215,7 +215,7 @@ gboolean _update_autostart(gpointer user_data)
     char* id = calc_id(uri);
 
     g_debug("[%s] %s is changed", __func__, uri);
-    js_post_message_simply("autostart-update", "{\"id\": \"%s\"}", id);
+    js_post_message_simply("update_autostart", "{\"id\": \"%s\"}", id);
 
     g_free(id);
 

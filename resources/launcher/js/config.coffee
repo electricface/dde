@@ -65,3 +65,24 @@ AUTOSTART_ICON_SIZE = 16
 SORT_MESSAGE =
     "name": _("Sort By _Frequency")
     "rate": _("Sort By _Name")
+
+
+class Config
+    constructor: ->
+        @read()
+        @methods =
+            "name": sort_by_name
+            "rate": sort_by_rate
+
+    sort_method: ->
+        @methods[@sort_method_name]
+
+    read: ->
+        @sort_method_name = "name"
+        if (method_name = DCore.Launcher.sort_method())?
+            @sort_method_name = method_name
+        else
+            save()
+
+    save: ->
+        DCore.Launcher.save_config('sort_method', @sort_method_name)

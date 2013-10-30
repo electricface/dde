@@ -104,7 +104,7 @@ class Item extends Widget
             [],
             [2, ITEM_HIDDEN_ICON_MESSAGE[@display_mode]],
             [],
-            [3, _("Send to d_esktop"), not DCore.Launcher.has_this_item_on_desktop(@core)],
+            [3, _("Send to d_esktop"), not DCore.Launcher.is_on_desktop(@core)],
             [4, _("Send to do_ck"), @parent.dock!=null],
             [],
             [5, AUTOSTARTUP_MESSAGE[@is_autostart]]

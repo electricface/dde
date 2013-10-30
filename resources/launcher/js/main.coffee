@@ -43,6 +43,28 @@
 #     _init_hidden_icons()
 # )
 
+###
+reset = ->
+    s_box.value = ""
+    selected_category_id = ALL_APPLICATION_CATEGORY_ID
+    # if s_box.value != ""
+    #     sort_category_info(sort_methods[sort_method])
+    update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
+    grid_load_category(selected_category_id)
+    save_hidden_apps()
+    _show_hidden_icons(false)
+    get_first_shown()?.scroll_to_view()
+    if Item.hover_item_id
+        event = new Event("mouseout")
+        Widget.look_up(Item.hover_item_id).element.dispatchEvent(event)
+
+exit_launcher = ->
+    DCore.Launcher.exit_gui()
+DCore.signal_connect("exit_launcher", ->
+    reset()
+)
+###
+
 DCore.signal_connect("autostart-update", (info)->
     if (app = Widget.look_up(info.id))?
         if DCore.Launcher.is_autostart(app.core)
@@ -60,3 +82,4 @@ DCore.Launcher.notify_workarea_size()
 
 launcher.bind_events()
 DCore.Launcher.webview_ok()
+DCore.Launcher.test()

@@ -34,14 +34,13 @@ connect_signals = ->
 
 
     DCore.signal_connect("draw_background", (info)->
-#     _b.style.backgroundImage = "url(#{info.path})"
+        body.style.backgroundImage = "url(#{info.path})"
     )
 
 
     DCore.signal_connect("update_items", ->
 #     echo "update items"
 
-#     return
 #     applications = {}
 #     hidden_icons = {}
 #     category_infos = []

@@ -35,8 +35,8 @@ class SearchBar
             search()
         )
 
-        cursor = create_element("span", "cursor", document.body)
-        cursor.innerText = "|"
+        # cursor = create_element("span", "cursor", document.body)
+        # cursor.innerText = "|"
 
     clean: ->
         @s_box.value = ""

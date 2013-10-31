@@ -82,14 +82,16 @@ bind_events = ->
                     if search_bar.empty()
                         DCore.Launcher.exit_gui()
                     else
-                        launcher_reset()
+                        search_bar.clean()
+                        grid.init_grid()
                 when BACKSPACE_KEY
                     e.stopPropagation()
                     e.preventDefault()
                     _last_value = search_bar.value()
                     search_bar.set_value(_last_value.substr(0, _last_value.length - 1))
                     if search_bar.empty()
-                        container.reset()
+                        search_bar.clean()
+                        grid.init_grid()
                         return  # to avoid to invoke search function
                     search()
                 when ENTER_KEY

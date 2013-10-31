@@ -83,3 +83,6 @@ class HiddenIconList
         Object.keys(@hidden_icons).filter((id) ->
             id in ids
         )
+
+    is_hidden_icon: (id) ->
+        @hidden_icons[id]?

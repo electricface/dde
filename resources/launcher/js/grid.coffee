@@ -31,9 +31,9 @@ class Grid
 
     reset: ->
         @get_first_shown()?.scroll_to_view()
+        @init_grid()
         @hidden_icons.save()
         @hidden_icons.hide()
-        @init_grid()
         if @hover_item_id
             event = new Event("mouseout")
             Widget.look_up(@hover_item_id).element.dispatchEvent(event)
@@ -60,13 +60,18 @@ class Grid
         else
             @grid.style.overflowY = "hidden"
 
+    update_selected: (el)->
+        @item_selected?.unselect()
+        @item_selected = el
+        @item_selected?.select()
+
     show_items: (items) ->
         # echo 'show_items'
         @update_selected(null)
 
         count = 0
-        for i in @hidden_icons
-            if i in items
+        for i in items
+            if @hidden_icons.is_hidden_icon(i)
                 count += 1
         @update_scroll_bar(items.length - count)
 
@@ -87,15 +92,10 @@ class Grid
 
     init_grid: ->
         @render_dom(category_column.selected_category_items())
-        @load_category(ALL_APPLICATION_CATEGORY_ID)
+        @load_category(category_column.selected_category_id)
 
     get_item_row_count: ->
         parseInt(@grid.clientWidth / ITEM_WIDTH)
-
-    update_selected: (el)->
-        @item_selected?.unselect()
-        @item_selected = el
-        @item_selected?.select()
 
     get_first_shown: ->
         first_item = all_apps[$(".item").id]

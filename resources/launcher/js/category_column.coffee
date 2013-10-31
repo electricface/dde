@@ -17,130 +17,171 @@
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
+
+class CategoryEntry
+    constructor: (info, sort_func)->
+        @items = []
+        @id = info.ID
+        @selected = false
+
+        @el = create_element('div', 'category_name')
+        @el.setAttribute('cat_id', info.ID)
+        @el.setAttribute('id', info.ID)
+        @el.innerText = info.Name
+
+        if @id == ALL_APPLICATION_CATEGORY_ID
+            frag = document.createDocumentFragment()
+            @items = []
+            for own key, value of all_apps
+                frag.appendChild(value.element)
+                @items.push(key)
+            grid.grid.appendChild(frag)
+        else
+            @items = DCore.Launcher.get_items_by_category(@id)
+
+        sort_func(@items)
+
+    select: ->
+        if not @selected
+            @selected = true
+            @el.classList.add('category_selected')
+
+    unselect: ->
+        if @selected
+            @selected = false
+            @el.classList.remove('category_selected')
+
+    hide: ->
+        @el.style.display = 'none'
+
+    show: ->
+        @el.style.display = 'block'
+
+    some: (func)->
+        @items.some(func)
+
+    every: (func)->
+        @items.every(func)
+
+    sort: (sort_func)->
+        sort_func(@item)
+
+
+class CategoryList
+    constructor: ->
+        # key: category id
+        # value: a list of Item's id which is in category
+        @categories = {}
+
+    add: (category)->
+        @categories[category.id] = category
+
+    category_entry: (id)->
+        @categories[id]
+
+    foreach: (func, other_data)->
+        for own id of @categories
+            func(@, @categories[id], other_data)
+        return
+
+
 class CategoryColumn
     constructor: (@parent)->
         # echo 'init category'
-        @category = $("#category")
-        @select_category_timeout_id = null
+        @timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
-        @s_box = @parent.parent.search_bar
-        @config = @parent.config
-        @apps = @parent.apps
 
-        # key: category id
-        # value: a list of Item's id which is in category
-        @category_infos = []
+        @category_list = new CategoryList()
 
-    connect: (obj)->
-        for own name, value of obj
-            @[name] = value
+        @el = $("#category")
+        @el.addEventListener('contextmenu', (e)->
+            e.preventDefault()
+            e.stopPropagation()
+        )
+        @el.addEventListener('click', (e)->
+            e.preventDefault()
+            e.stopPropagation()
+        )
+        @el.addEventListener('mouseover', (e)=>
+            if 'category_name' in e.target.classList
+                item = @category_list.category_entry(e.target.id)
+                if not item.selected
+                    search_bar.clean if search_bar.empty()
+                    @timeout_id = setTimeout(
+                        =>
+                            grid.load_category(item.id)
+                            @selected_category_id = item.id
+                            @show_selected_category()
+                        , 25)
+        )
+        @el.addEventListener('mouseout', (e)=>
+            if 'category_name' in e.target.classList
+                item = @category_list.category_entry(e.target.id)
+                if @timeout_id != 0
+                    clearTimeout(@timeout_id)
+        )
 
     load: ->
         frag = document.createDocumentFragment()
         for info in DCore.Launcher.get_categories()
-            c = @create_category(info)
-            frag.appendChild(c)
-            @load_category_infos(info.ID, @config.sort_method())
-
-        @category.appendChild(frag)
+            c = new CategoryEntry(info, config.sort_method())
+            frag.appendChild(c.el)
+            @category_list.add(c)
+        @el.appendChild(frag)
 
         @adaptive_height()
         @show_selected_category()
 
-    create_category: (info) ->
-        el = document.createElement('div')
-
-        el.setAttribute('class', 'category_name')
-        el.setAttribute('cat_id', info.ID)
-        el.setAttribute('id', info.ID)
-        el.innerText = info.Name
-
-        el.addEventListener('contextmenu', (e)->
-            e.preventDefault()
-            e.stopPropagation()
-        )
-        el.addEventListener('click', (e) ->
-            e.stopPropagation()
-        )
-        el.addEventListener('mouseover', (e)=>
-            e.stopPropagation()
-            if info.ID != @selected_category_id
-                @s_box.clean() if !@s_box.empty()
-                @select_category_timeout_id = setTimeout(
-                    =>
-                        @grid.load_category(info.ID)
-                        @selected_category_id = info.ID
-                        @show_selected_category()
-                    , 25)
-        )
-        el.addEventListener('mouseout', (e)=>
-            if @select_category_timeout_id != 0
-                clearTimeout(@select_category_timeout_id)
-        )
-        return el
-
-    load_category_infos: (cat_id, sort_func)->
-        if cat_id == ALL_APPLICATION_CATEGORY_ID
-            frag = document.createDocumentFragment()
-            @category_infos[cat_id] = []
-            for own key, value of @apps
-                frag.appendChild(value.element)
-                @category_infos[cat_id].push(key)
-            @grid.grid.appendChild(frag)
-        else
-            info = DCore.Launcher.get_items_by_category(cat_id)
-            @category_infos[cat_id] = info
-
-        sort_func(@category_infos[cat_id])
-
     adaptive_height: ->
-        warp = @category.parentNode
+        warp = @el.parentNode
         # add 20px for margin
-        categories_height = @category.children.length * (@category.lastElementChild.clientHeight + 20)
+        categories_height = @el.children.length * (@el.lastElementChild.clientHeight + 20)
         warp_height = window.screen.height - 100
         if categories_height > warp_height
             warp.style.overflowY = "scroll"
             warp.style.marginBottom = "#{GRID_MARGIN_BOTTOM}px"
 
     show_selected_category: ->
-        cns = $s(".category_name")
-        for c in cns
-            if `this.selected_category_id == c.getAttribute("cat_id")`
-                c.classList.add('category_selected')
+        @category_list.foreach((list, item, c)=>
+            if item.id == c.selected_category_id
+                item.select()
             else
-                c.classList.remove('category_selected')
-        return
+                item.unselect()
+        , @)
+
+    category_items: (id)->
+        @category_list.category_entry(id).items
+
+    selected_category_items: ->
+        @category_items(@selected_category_id)
 
     hide_empty_category: ->
-        for own i of @category_infos
-            all_is_hidden = @category_infos["#{i}"].every((el, idx, arr) =>
-                @apps[el].display_mode == "hidden"
+        @category_list.foreach((list, item, c)=>
+            all_is_hidden = item.every((el, idx, arr)->
+                all_apps[el].display_mode == "hidden"
             )
-            if all_is_hidden and not Item.display_temp
-                $("##{i}").style.display = "none"
-                # i is a string, selected_category_id is a number
-                # "==" in coffee is "===" in js
-                if "" + @selected_category_id == i
-                    @selected_category_id = ALL_APPLICATION_CATEGORY_ID
-                    @show_selected_category()
-                @grid.load_category(@selected_category_id)
-        return
+
+            if all_is_hidden and Item.display_temp
+                item.hidden()
+                if item.id == c.selected_category_id
+                    c.selected_category_id = ALL_APPLICATION_CATEGORY_ID
+                    c.show_selected_category()
+                grid.load_category(c.selected_category_id)
+        , @)
 
     show_nonempty_category: ->
-        for own i of @category_infos
-            not_all_is_hidden = @category_infos["#{i}"].some((el, idx, arr) =>
-                @apps[el].display_mode != "hidden"
+        @category_list.foreach((list, item)->
+            not_all_is_hidden = item.some((el, idx, arr) ->
+                all_apps[el].display_mode != "hidden"
             )
+
             if not_all_is_hidden or Item.display_temp
-                $("##{i}").style.display = "block"
-        return
+                item.show()
+        )
 
     reset: ->
+        if @timeout_id
+            clearTimeout(@timeout_id)
+            @timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
-        if @select_category_timeout_id
-            clearTimeout(@select_category_timeout_id)
-            @select_category_timeout_id = null
         @show_selected_category()
-
-    selected_category_infos: ->
-        @category_infos[@selected_category_id]

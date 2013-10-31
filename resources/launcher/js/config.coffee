@@ -54,6 +54,7 @@ ITEM_HIDDEN_ICON_MESSAGE =
     'hidden': _("_Display this icon")
 
 HIDE_ICON_CLASS = 'hide_icon'
+INVALID_ICON = 'invalid-dock_app'
 
 AUTOSTARTUP_MESSAGE =
     false: _("_Add to autostart")

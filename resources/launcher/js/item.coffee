@@ -24,11 +24,7 @@ class Item extends Widget
     constructor: (@id, @core, @parent)->
         super
         @load_img()
-        @grid = @parent.grid
-        @apps = @parent.apps
-        @hidden_icons = @grid.hidden_icons
-        @category_column = @parent.category_column
-        @launcher = @parent.parent
+        @hidden_icons = grid.hidden_icons
 
         @name = create_element("div", "item_name", @element)
         @name.innerText = DCore.DEntry.get_name(@core)
@@ -39,10 +35,8 @@ class Item extends Widget
         @try_set_title(DCore.DEntry.get_name(@core), 80)
         @display_mode = 'display'
 
-        if DCore.Launcher.is_autostart(@core)
+        if (@is_autostart = DCore.Launcher.is_autostart(@core))
             @add_to_autostart()
-        else
-            @is_autostart = false
 
         @element.addEventListener("contextmenu", Item._contextmenu_callback(@))
 
@@ -56,7 +50,7 @@ class Item extends Widget
     load_img: ->
         im = DCore.DEntry.get_icon(@core)
         if im == null
-            im = DCore.get_theme_icon('invalid-dock_app', ITEM_IMG_SIZE)
+            im = DCore.get_theme_icon(INVALID_ICON, ITEM_IMG_SIZE)
 
         @img = create_img("", im, @element)
 
@@ -72,7 +66,7 @@ class Item extends Widget
                 @img.className = 'vbar_img'
 
         @img.onerror = (e) =>
-            src = DCore.get_theme_icon('invalid-dock_app', ITEM_IMG_SIZE)
+            src = DCore.get_theme_icon(INVALID_ICON, ITEM_IMG_SIZE)
             if src != @img.src
                 @img.src = src
 
@@ -98,14 +92,13 @@ class Item extends Widget
             @add_to_autostart()
 
     _menu: ->
-        # echo AUTOSTARTUP_MESSAGE[@is_autostart]
         menu = [
             [1, _("_Open")],
             [],
             [2, ITEM_HIDDEN_ICON_MESSAGE[@display_mode]],
             [],
             [3, _("Send to d_esktop"), not DCore.Launcher.is_on_desktop(@core)],
-            [4, _("Send to do_ck"), @parent.dock!=null],
+            [4, _("Send to do_ck"), dock!=null],
             [],
             [5, AUTOSTARTUP_MESSAGE[@is_autostart]]
         ]
@@ -127,9 +120,9 @@ class Item extends Widget
         e.stopPropagation()
         @element.style.cursor = 'wait'
         DCore.DEntry.launch(@core, [])
-        @grid.hover_item_id = @id
+        grid.hover_item_id = @id
         @element.style.cursor = 'auto'
-        @launcher.exit()
+        exit()
 
     do_dragstart: (e)=>
         e.dataTransfer.setData("text/uri-list", DCore.DEntry.get_uri(@core))
@@ -142,10 +135,10 @@ class Item extends Widget
         if HIDE_ICON_CLASS not in @element.classList
             @add_css_class(HIDE_ICON_CLASS, @element)
 
-        if not Item.display_temp and not @grid.show_hidden_icons
+        if not Item.display_temp and not grid.show_hidden_icons
             @element.style.display = 'none'
-            @grid.update_scroll_bar(@category_column.selected_category_infos().length )#- hidden_icons_num)
-            @category_column.hide_empty_category()
+            grid.update_scroll_bar(category_column.selected_category_items().length )#- hidden_icons_num)
+            category_column.hide_empty_category()
 
         @hidden_icons.add(@)
 
@@ -162,7 +155,7 @@ class Item extends Widget
 
     display_icon_temp: ->
         @element.style.display = 'block'
-        @grid.update_scroll_bar(@category_column.selected_category_infos().length)
+        grid.update_scroll_bar(category_column.selected_category_items().length)
 
     toggle_icon: ->
         if @display_mode == 'display'
@@ -177,7 +170,7 @@ class Item extends Widget
             when 1 then DCore.DEntry.launch(@core, [])
             when 2 then @toggle_icon()
             when 3 then DCore.DEntry.copy_dereference_symlink([@core], DCore.Launcher.get_desktop_entry())
-            when 4 then @parent.dock?.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
+            when 4 then dock?.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
             when 5 then @toggle_autostart()
             when 100 then DCore.DEntry.report_bad_icon(@core)  # internal
 
@@ -216,7 +209,7 @@ class Item extends Widget
         @element.style.background = "rgba(0, 183, 238, 0.2)"
         @element.style.border = "1px rgba(255, 255, 255, 0.2) solid"
         @element.style.borderRadius = "2px"
-        @grid.hover_item_id = @id
+        grid.hover_item_id = @id
 
     do_mouseout: =>
         @element.style.background = ''
@@ -279,5 +272,3 @@ sort_by_rate = do ->
             else
                 return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
         )
-
-

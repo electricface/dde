@@ -22,18 +22,12 @@
 class Grid
     constructor: (@parent)->
         # echo 'init grid'
-        @apps = @parent.apps
         @grid = $('#grid')
         @item_selected = null
         @hover_item_id = null
         @hidden_icons = new HiddenIconList(@)
 
         @show_hidden_icons = false
-
-    connect: (obj)->
-        for own name, value of obj
-            @[name] = value
-        @hidden_icons.connect(obj)
 
     reset: ->
         @get_first_shown()?.scroll_to_view()
@@ -76,24 +70,24 @@ class Grid
                 count += 1
         @update_scroll_bar(items.length - count)
 
-        for own key, value of @apps
+        for own key, value of all_apps
             if key not in items
                 value.hide()
 
         count = 0
         for id in items
             group_num = parseInt(count++ / NUM_SHOWN_ONCE)
-            setTimeout(@apps[id].show, 4 + group_num)
+            setTimeout(all_apps[id].show, 4 + group_num)
 
         return  # some return like here will stop js returning stupid things
 
     load_category: (cat_id) ->
-        @show_items(@parent.category_column.category_infos[cat_id])
+        @show_items(category_column.category_items(cat_id))
         @update_selected(null)
 
     init_grid: ->
         sort_category_info(sort_methods[sort_method])
-        @render_dom(@parent.category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
+        @render_dom(category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
         @load_category(ALL_APPLICATION_CATEGORY_ID)
 
     show_grid_dom_child: ->
@@ -112,7 +106,7 @@ class Grid
         @item_selected?.select()
 
     get_first_shown: ->
-        first_item = @apps[$(".item").id]
+        first_item = all_apps[$(".item").id]
         if first_item?.is_shown()
             first_item
         else
@@ -176,9 +170,9 @@ class Grid
 
         if @show_hidden_icons
             Item.display_temp = true
-            @hidden_icons.show(@category_column.selected_category_infos())
+            @hidden_icons.show(category_column.selected_category_items())
         else
             Item.display_temp = false
             @hidden_icons.hide()
 
-        @update_scroll_bar(@category_column.selected_category_infos().length)
+        @update_scroll_bar(category_column.selected_category_items().length)

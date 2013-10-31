@@ -23,12 +23,12 @@ connect_signals = ->
         document.body.style.maxHeight = "#{height}px"
         $('#grid').style.maxHeight = "#{height-60}px"
         # echo 'category column adaptive height'
-        launcher?.container.category_column.adaptive_height()
+        container.category_column.adaptive_height()
     )
 
 
     DCore.signal_connect("lost_focus", (info)=>
-        if launcher.dock.LauncherShouldExit_sync(info.xid)
+        if dock.LauncherShouldExit_sync(info.xid)
             DCore.Launcher.exit_gui()
     )
 
@@ -66,7 +66,7 @@ connect_signals = ->
     )
 
     DCore.signal_connect("exit_launcher", ->
-        launcher.exit()
+        exit()
     )
 
 ###

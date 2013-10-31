@@ -20,9 +20,7 @@
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
 
-launcher = new Launcher()
-launcher.bind_events()
-
+bind_events()
 connect_signals()
 
 DCore.Launcher.notify_workarea_size()

@@ -17,92 +17,94 @@
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, see <http://www.gnu.org/licenses/>.
 
-class Launcher
-    constructor: ->
-        # echo 'init launcher'
-        @body = document.body
-        try
-            @dock = DCore.DBus.session("com.deepin.dde.dock")
-        catch error
-            @dock = null
 
-        @search_bar = new SearchBar(@)
-        @container = new Container(@)
+body = document.body
+try
+    dock = DCore.DBus.session("com.deepin.dde.dock")
+catch error
+    dock = null
 
-    exit: ->
-        @search_bar.clean()
-        @container.reset()
 
-    bind_events: ->
-        @body.addEventListener("click", (e)=>
-            e.stopPropagation()
-            if e.target != $("#category")
-                DCore.Launcher.exit_gui()
-        )
+config = new Config()
+search_bar = new SearchBar()
+grid = new Grid()
+category_column = new CategoryColumn()
+container = new Container()
 
-        @body.addEventListener('keypress', (e) =>
-            if e.which != ESC_KEY and not e.ctrlKey and e.which != BACKSPACE_KEY
-                @search_bar.append_value(String.fromCharCode(e.which))
-                search()
-        )
 
-        # this does not work on keypress
-        @body.addEventListener("keydown", do =>
-            _last_value = ''
-            (e) =>
-                if e.which == TAB_KEY
-                    e.preventDefault()
-                    if e.shiftKey and e.ctrlKey
-                        @container.grid.selected_up()
-                    else if e.shiftKey
-                        @container.grid.selected_prev()
-                    else if e.ctrlKey
-                        @container.grid.selected_down()
+exit = ->
+    search_bar.clean()
+    container.reset()
+
+
+bind_events = ->
+    body.addEventListener("click", (e)=>
+        e.stopPropagation()
+        if e.target != $("#category")
+            DCore.Launcher.exit_gui()
+    )
+
+    body.addEventListener('keypress', (e) =>
+        if e.which != ESC_KEY and not e.ctrlKey and e.which != BACKSPACE_KEY
+            search_bar.append_value(String.fromCharCode(e.which))
+            search()
+    )
+
+    # this does not work on keypress
+    body.addEventListener("keydown", (e) =>
+        if e.which == TAB_KEY
+            e.preventDefault()
+            if e.shiftKey and e.ctrlKey
+                grid.selected_up()
+            else if e.shiftKey
+                grid.selected_prev()
+            else if e.ctrlKey
+                grid.selected_down()
+            else
+                grid.selected_next()
+        else if e.shiftKey or e.altKey
+            return
+        else if e.ctrlKey
+            e.preventDefault()
+            switch e.which
+                when P_KEY
+                    grid.selected_up()
+                when F_KEY
+                    grid.selected_next()
+                when B_KEY
+                    grid.selected_prev()
+                when N_KEY
+                    grid.selected_down()
+        else if not e.shiftKey and not e.altKey
+            switch e.which
+                when ESC_KEY
+                    e.stopPropagation()
+                    if search_bar.empty()
+                        DCore.Launcher.exit_gui()
                     else
-                        @container.grid.selected_next()
-                else if e.shiftKey or e.altKey
-                    return
-                else if e.ctrlKey
+                        search_bar.clean()
+                        # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
+                        grid.load_category(category_column.selected_category_id)
+                when BACKSPACE_KEY
+                    e.stopPropagation()
                     e.preventDefault()
-                    switch e.which
-                        when P_KEY
-                            @container.grid.selected_up()
-                        when F_KEY
-                            @container.grid.selected_next()
-                        when B_KEY
-                            @container.grid.selected_prev()
-                        when N_KEY
-                            @container.grid.selected_down()
-                else if not e.shiftKey and not e.altKey
-                    switch e.which
-                        when ESC_KEY
-                            e.stopPropagation()
-                            if @search_bar.empty()
-                                DCore.Launcher.exit_gui()
-                            else
-                                @search_bar.clean()
-                                # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
-                                @container.grid.load_category(@container.category_column.selected_category_id)
-                        when BACKSPACE_KEY
-                            e.stopPropagation()
-                            e.preventDefault()
-                            _last_value = @search_bar.value()
-                            @search_bar.set_value(_last_value.substr(0, _last_value.length - 1))
-                            if @search_bar.empty()
-                                @container.reset()
-                                return  # to avoid to invoke search function
-                            search()
-                        when ENTER_KEY
-                            if @container.grid.item_selected
-                                @container.grid.item_selected.do_click(e)
-                            else
-                                @container.grid.get_first_shown()?.do_click(e)
-                        when UP_ARROW
-                            @container.grid.selected_up()
-                        when DOWN_ARROW
-                            @container.grid.selected_down()
-                        when LEFT_ARROW
-                            @container.grid.selected_prev()
-                        when RIGHT_ARROW
-                            @container.grid.selected_next()
-        )
+                    _last_value = search_bar.value()
+                    search_bar.set_value(_last_value.substr(0, _last_value.length - 1))
+                    if search_bar.empty()
+                        container.reset()
+                        return  # to avoid to invoke search function
+                    search()
+                when ENTER_KEY
+                    if grid.item_selected
+                        grid.item_selected.do_click(e)
+                    else
+                        grid.get_first_shown()?.do_click(e)
+                when UP_ARROW
+                    grid.selected_up()
+                when DOWN_ARROW
+                    grid.selected_down()
+                when LEFT_ARROW
+                    grid.selected_prev()
+                when RIGHT_ARROW
+                    grid.selected_next()
+    )

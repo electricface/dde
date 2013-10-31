@@ -21,42 +21,42 @@ class HiddenIconList
     constructor: (@parent)->
         # echo 'init hidden icon list'
         @grid = @parent
-        @apps = @parent.apps
+
+        # key: the id of each instance of Item class
+        # value: Item class instance
         @hidden_icons = {}
         @length = 0
 
-    connect: (obj)->
-        for own name, value of obj
-            @[name] = value
-
     load: ->
         hidden_icon_ids = DCore.Launcher.load_hidden_apps()
-        if hidden_icon_ids?
-            hidden_icon_ids.filter((elem, index, array) =>
-                if not @apps[elem]
-                    array.splice(index, 1)
-            )
-            DCore.Launcher.save_hidden_apps(hidden_icon_ids)
-            for id in hidden_icon_ids
-                if @apps[id]
-                    @add(@apps[id])
+        if not hidden_icon_ids?
+            return
+
+        hidden_icon_ids.filter((elem, index, array) =>
+            if not all_apps[elem]
+                array.splice(index, 1)
+        )
+        DCore.Launcher.save_hidden_apps(hidden_icon_ids)
+        for id in hidden_icon_ids
+            if all_apps[id]
+                @add(all_apps[id])
 
     add: (item)->
-        @hidden_icons[item.id] = item
-        @length += 1
-        @save()
+        if item
+            @hidden_icons[item.id] = item
+            @length += 1
+            @save()
         item
 
     remove: (item)->
-        delete @hidden_icons[item.id]
-        @length -= 1
-        @save()
+        if item and delete @hidden_icons[item.id]
+            @length -= 1
+            @save()
         item
 
     save: ->
-        hidden_icons_ids = []
-        for own id of @hidden_icons
-            hidden_icons_ids.push(id)
+        hidden_icons_ids = Object.keys(@hidden_icons)
+        # echo "#{hidden_icons_ids}"
         DCore.Launcher.save_hidden_apps(hidden_icons_ids)
 
     show: (items)->
@@ -64,18 +64,22 @@ class HiddenIconList
             if item in items
                 @hidden_icons[item].display_icon_temp()
 
-        @category_column.show_nonempty_category()
-        len = @category_column.selected_category_infos().length
-        @grid.update_scroll_bar(len)
+        category_column.show_nonempty_category()
+        len = category_column.selected_category_items().length
+        grid.update_scroll_bar(len)
         return
 
     hide: ->
         for own item of @hidden_icons
             @hidden_icons[item].hide_icon()
 
-        @category_column.hide_empty_category()
-        len = @category_column.selected_category_infos().length
-        @grid.update_scroll_bar(len)
+        category_column.hide_empty_category()
+        len = category_column.selected_category_items().length
+        grid.update_scroll_bar(len)
         return
 
-    catgory_hidden_icons: (cat_id)->
+    hidden_icons_of_category: (cat_id)->
+        ids = category_column.category_items(cat_id)
+        Object.keys(@hidden_icons).filter((id) ->
+            id in ids
+        )

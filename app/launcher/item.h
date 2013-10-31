@@ -9,6 +9,7 @@
 #define LAUNCHER_CONF "launcher/config.ini"
 #define AUTOSTART_DIR "autostart"
 #define GNOME_AUTOSTART_KEY "X-GNOME-Autostart-enabled"
+#define HIDDEN_ICONS "HiddenIcons"
 
 void destroy_item_config();
 GPtrArray* get_autostart_paths();

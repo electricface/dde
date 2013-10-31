@@ -54,7 +54,7 @@ JSValueRef launcher_load_hidden_apps()
     GError* error = NULL;
     gsize length = 0;
     gchar** raw_hidden_app_ids = g_key_file_get_string_list(hidden_apps,
-                                                            "__Config__",
+                                                            HIDDEN_ICONS,
                                                             "app_ids",
                                                             &length,
                                                             &error);
@@ -81,10 +81,10 @@ JS_EXPORT_API
 void launcher_save_hidden_apps(ArrayContainer hidden_app_ids)
 {
     if (hidden_app_ids.data != NULL) {
-        g_key_file_set_string_list(hidden_apps, "__Config__", "app_ids",
+        g_key_file_set_string_list(hidden_apps, HIDDEN_ICONS, "app_ids",
             (const gchar* const*)hidden_app_ids.data, hidden_app_ids.num);
     } else {
-        g_key_file_set_string(hidden_apps, "__Config__", "app_ids", "");
+        g_key_file_set_string(hidden_apps, HIDDEN_ICONS, "app_ids", "");
     }
     save_app_config(hidden_apps, APPS_INI);
 }

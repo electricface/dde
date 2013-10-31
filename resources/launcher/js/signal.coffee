@@ -66,7 +66,7 @@ connect_signals = ->
     )
 
     DCore.signal_connect("exit_launcher", ->
-        exit()
+        launcher_reset()
     )
 
 ###

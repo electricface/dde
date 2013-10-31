@@ -46,6 +46,7 @@
 #include "test.h"
 #include "DBUS_launcher.h"
 
+#define ANOTHER_IS_RUNNING _("another instance of launcher is running...\n")
 
 static GKeyFile* launcher_config = NULL;
 PRIVATE GtkWidget* container = NULL;
@@ -321,7 +322,7 @@ int main(int argc, char* argv[])
 
     if (argc == 2 && 0 == g_strcmp0("-H", argv[1])) {
         if (is_application_running(LAUNCHER_ID_NAME)) {
-            g_warning(_("another instance of launcher is running...\n"));
+            g_warning(ANOTHER_IS_RUNNING);
             return 0;
         }
 
@@ -332,7 +333,7 @@ int main(int argc, char* argv[])
     }
 
     if (is_application_running(LAUNCHER_ID_NAME)) {
-        g_warning(_("another instance of launcher is running...\n"));
+        g_warning(ANOTHER_IS_RUNNING);
 
         if (!not_shows_launcher) {
             dbus_launcher_toggle();

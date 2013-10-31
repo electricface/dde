@@ -68,6 +68,66 @@ SORT_MESSAGE =
     "rate": _("Sort By _Name")
 
 
+compare_string = (s1, s2) ->
+    # echo "compare #{s1}, #{s2}"
+    return 1 if s1 > s2
+    return 0 if s1 == s2
+    return -1
+
+
+get_name_by_id = (id) ->
+    if Widget.look_up(id)?
+        DCore.DEntry.get_name(Widget.look_up(id).core)
+    else
+        ""
+
+
+sort_by_name = (items)->
+    # echo 'name'
+    items.sort((lhs, rhs)->
+        lhs_name = get_name_by_id(lhs)
+        rhs_name = get_name_by_id(rhs)
+        compare_string(lhs_name, rhs_name)
+    )
+
+
+sort_by_rate = do ->
+    rates = null
+    items_name_map = {}
+
+    (items, update)->
+        # echo 'rate'
+        if update
+            rates = DCore.Launcher.get_app_rate()
+
+            items_name_map = {}
+            for id in category_infos[ALL_APPLICATION_CATEGORY_ID]
+                if not items_name_map[id]?
+                    items_name_map[id] =
+                        DCore.DEntry.get_appid(Widget.look_up(id).core)
+
+        items.sort((lhs, rhs)->
+            lhs_appid = items_name_map[lhs]
+            lhs_rate = rates[lhs_appid] if lhs_appid?
+
+            rhs_appid = items_name_map[rhs]
+            rhs_rate = rates[rhs_appid] if rhs_appid?
+
+            if lhs_rate? and rhs_rate?
+                rates_delta = rhs_rate - lhs_rate
+                if rates_delta == 0
+                    return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
+                else
+                    return rates_delta
+            else if lhs_rate? and not rhs_rate?
+                return -1
+            else if not lhs_rate? and rhs_rates?
+                return 1
+            else
+                return compare_string(get_name_by_id(lhs), get_name_by_id(rhs))
+        )
+
+
 class Config
     constructor: ->
         @read()

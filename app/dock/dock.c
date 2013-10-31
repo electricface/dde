@@ -36,6 +36,7 @@
 #include "DBUS_dock.h"
 
 #define DOCK_CONFIG "dock/config.ini"
+#define ANOTHER_IS_RUNNING _("another instance of dock is running...\n")
 
 static GtkWidget* container = NULL;
 static GtkWidget* webview = NULL;
@@ -130,7 +131,7 @@ void size_workaround(GtkWidget* container, GdkRectangle* allocation)
         gdk_flush();
         gdk_window_set_events(w, gdk_window_get_events(w));
 
-        g_warning("size workaround run fix (%d,%d) to (%d,%d)\n",
+        g_warning("[%s] size workaround run fix (%d,%d) to (%d,%d)\n", __func__,
                 allocation->width, allocation->height,
                 gdk_screen_width(), gdk_screen_height());
     }
@@ -220,7 +221,7 @@ void check_version()
 int main(int argc, char* argv[])
 {
     if (is_application_running(DOCK_ID_NAME)) {
-        g_warning(_("another instance of dock is running...\n"));
+        g_warning(ANOTHER_IS_RUNNING);
         return 1;
     }
 

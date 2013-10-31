@@ -74,7 +74,7 @@ JSValueRef build_app_info(const char* app_id)
     }
 
     if (info == NULL) {
-        g_warning("cannot get app info");
+        g_warning("[%s] cannot get app info", __func__);
         g_key_file_remove_group(k_apps, app_id, NULL);
         save_app_config(k_apps, APPS_INI);
         update_task_list();
@@ -221,8 +221,8 @@ void update_dock_apps()
 
         g_strfreev(list);
     } else {
-        g_warning("[%s(%s)] get string list from file(%s) failed: %s",
-                  __func__, __FILE__, APPS_INI, err->message);
+        g_warning("[%s] get string list from file(%s) failed: %s",
+                  __func__, APPS_INI, err->message);
         g_error_free(err);
     }
 }
@@ -371,7 +371,7 @@ void dock_request_dock(const char* path)
         g_free(app_id);
         g_object_unref(info);
     } else {
-        g_warning("request dock %s is invalid\n", path);
+        g_warning("[%s] request dock %s is invalid\n", __func__, path);
     }
 }
 

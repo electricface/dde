@@ -33,7 +33,7 @@ class Grid
         @get_first_shown()?.scroll_to_view()
         @hidden_icons.save()
         @hidden_icons.hide()
-        @load_category(ALL_APPLICATION_CATEGORY_ID)
+        @init_grid()
         if @hover_item_id
             event = new Event("mouseout")
             Widget.look_up(@hover_item_id).element.dispatchEvent(event)
@@ -86,16 +86,8 @@ class Grid
         @update_selected(null)
 
     init_grid: ->
-        sort_category_info(sort_methods[sort_method])
-        @render_dom(category_column.category_infos[ALL_APPLICATION_CATEGORY_ID])
+        @render_dom(category_column.selected_category_items())
         @load_category(ALL_APPLICATION_CATEGORY_ID)
-
-    show_grid_dom_child: ->
-        c = @grid.children
-        i = 0
-        while i < c.length
-            echo "#{get_name_by_id(c[i].id)}"
-            i = i + 1
 
     get_item_row_count: ->
         parseInt(@grid.clientWidth / ITEM_WIDTH)

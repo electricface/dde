@@ -144,14 +144,14 @@ void try_get_deepin_icon(const char* _app_id, char** icon, int* operator_code)
                 break;
             case ICON_OPERATOR_USE_PATH:
                 g_free(app_id);
-                g_warning("[try_get_deepin_icon] Hasn't support set path Icon Handler\n");
+                g_warning("[%s] Hasn't support set path Icon Handler\n", __func__);
                 break;
             case ICON_OPERATOR_SET_DOMINANTCOLOR:
                 g_free(app_id);
-                g_warning("[try_get_deepin_icon] Hasn't support set dominantcolor Icon Handler\n");
+                g_warning("[%s] Hasn't support set dominantcolor Icon Handler\n", __func__);
                 break;
             default:
-                g_warning("[try_get_deepin_icon] Hasn't support unknow Icon Handler\n");
+                g_warning("[%s] Hasn't support unknow Icon Handler\n", __func__);
 
         }
     } else {

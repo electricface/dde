@@ -32,7 +32,7 @@ category_column = new CategoryColumn()
 container = new Container()
 
 
-exit = ->
+launcher_reset = ->
     search_bar.clean()
     container.reset()
 
@@ -82,9 +82,7 @@ bind_events = ->
                     if search_bar.empty()
                         DCore.Launcher.exit_gui()
                     else
-                        search_bar.clean()
-                        # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
-                        grid.load_category(category_column.selected_category_id)
+                        launcher_reset()
                 when BACKSPACE_KEY
                     e.stopPropagation()
                     e.preventDefault()

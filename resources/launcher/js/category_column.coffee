@@ -185,3 +185,8 @@ class CategoryColumn
             @timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
         @show_selected_category()
+        config.sort_method()(@selected_category_items())
+        @category_list.foreach((list, item) ->
+            config.sort_method()(item.items)
+        )
+

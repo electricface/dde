@@ -32,8 +32,7 @@ class Container
 
         category_column.load()
 
-        grid.render_dom(category_column.selected_category_items())
-        grid.load_category(category_column.selected_category_id)
+        grid.init_grid()
         grid.hidden_icons.load()
         grid.hidden_icons.hide()
 
@@ -54,8 +53,8 @@ class Container
         )
 
     reset: ->
-        grid.reset()
         category_column.reset()
+        grid.reset()
 
     _menu: ->
         menu = [[1, SORT_MESSAGE[config.sort_method_name]]]

@@ -128,7 +128,7 @@ void calc_dominant_color_by_pixbuf(GdkPixbuf* pixbuf, double *r, double *g, doub
     guint size = 0;
     guchar* buf = gdk_pixbuf_get_pixels_with_length(pixbuf, &size);
     if (size == 0) {
-        g_warning("Get an zero length valid pixbuf!!!\n");
+        g_warning("[%s] Get an zero length valid pixbuf!!!\n", __func__);
         set_default_rgb(r, g, b);
     } else {
         calc(buf, size, gdk_pixbuf_get_n_channels(pixbuf), r, g, b);

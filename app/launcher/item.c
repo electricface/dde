@@ -19,6 +19,7 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  **/
 
+#include "../dock/tasklist.h"
 #include "item.h"
 #include "jsextension.h"
 #include "utils.h"
@@ -59,8 +60,8 @@ JSValueRef launcher_load_hidden_apps()
                                                             &length,
                                                             &error);
     if (raw_hidden_app_ids == NULL) {
-        g_warning("read config file %s/%s failed: %s", g_get_user_config_dir(),
-                  APPS_INI, error->message);
+        g_warning("[%s] read config file(\"%s/%s\") failed: %s", __func__,
+                  g_get_user_config_dir(), APPS_INI, error->message);
         g_error_free(error);
         return jsvalue_null();
     }
@@ -195,7 +196,7 @@ gboolean _check_exist(const char* path, const char* name)
     GDir* dir = g_dir_open(path, 0, &err);
 
     if (dir == NULL) {
-        g_warning("[_check_exist] open dir(%s) failed: %s", path, err->message);
+        g_warning("[%s] open dir(%s) failed: %s", __func__, path, err->message);
         g_error_free(err);
         return FALSE;
     }
@@ -404,7 +405,7 @@ JSValueRef launcher_sort_method()
     GError* error = NULL;
     char* sort_method = g_key_file_get_string(launcher_config, "main", "sort_method", &error);
     if (error != NULL) {
-        g_warning("get sort method error: %s", error->message);
+        g_warning("[%s] get sort method error: %s", __func__, error->message);
         g_error_free(error);
         return jsvalue_null();
     }
@@ -433,7 +434,7 @@ void launcher_save_config(char const* key, char const* value)
 JS_EXPORT_API
 JSValueRef launcher_get_app_rate()
 {
-    GKeyFile* record_file = load_app_config("dock/record.ini");
+    GKeyFile* record_file = load_app_config(RECORD_FILE);
 
     gsize size = 0;
     char** groups = g_key_file_get_groups(record_file, &size);
@@ -445,7 +446,9 @@ JSValueRef launcher_get_app_rate()
         gint64 num = g_key_file_get_int64(record_file, groups[i], "StartNum", &error);
 
         if (error != NULL) {
-            g_warning("get record file value failed: %s", error->message);
+            g_warning("[%s] get record file(\"%s/%s\") value failed: %s",
+                      __func__, g_get_user_config_dir(), RECORD_FILE,
+                      error->message);
             g_clear_error(&error);
             continue;
         }

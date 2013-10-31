@@ -23,7 +23,10 @@
 #ifndef __TASKLIST_ACTIVE_WINDOW_H
 #define __TASKLIST_ACTIVE_WINDOW_H
 
+#include <glib.h>
+
 #define FILTER_FILE "dock/filter.ini"
+#define RECORD_FILE "dock/record.ini"
 
 void init_task_list();
 gboolean is_has_client(const char* app_id);
@@ -34,3 +37,4 @@ gboolean dock_has_maximize_client();
 double dock_get_active_window();
 
 #endif
+

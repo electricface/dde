@@ -46,7 +46,6 @@ extern char* dcore_get_theme_icon(const char*, double);
 #include <math.h>
 #include <gio/gdesktopappinfo.h>
 
-#define RECORD_FILE "dock/record.ini"
 GKeyFile* record_file = NULL;
 
 PRIVATE Atom ATOM_WINDOW_HIDDEN;
@@ -354,7 +353,7 @@ Client* create_client_from_window(Window w)
     g_key_file_set_uint64(record_file, c->app_id, "StartNum", last_time + 1);
     save_app_config(record_file, RECORD_FILE);
 
-    g_debug("");
+    g_debug(" ");
 
     return c;
 }

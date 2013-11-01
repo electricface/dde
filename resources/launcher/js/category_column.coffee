@@ -31,7 +31,6 @@ class CategoryEntry
 
         if @id == ALL_APPLICATION_CATEGORY_ID
             frag = document.createDocumentFragment()
-            @items = []
             for own key, value of all_apps
                 frag.appendChild(value.element)
                 @items.push(key)
@@ -57,14 +56,14 @@ class CategoryEntry
     show: ->
         @el.style.display = 'block'
 
-    some: (func)->
-        @items.some(func)
+    some: (pred_func)->
+        @items.some(pred_func)
 
-    every: (func)->
-        @items.every(func)
+    every: (pred_func)->
+        @items.every(pred_func)
 
     sort: (sort_func)->
-        sort_func(@item)
+        sort_func(@items)
 
 
 class CategoryList
@@ -185,8 +184,12 @@ class CategoryColumn
             @timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
         @show_selected_category()
-        config.sort_method()(@selected_category_items())
-        @category_list.foreach((list, item) ->
-            config.sort_method()(item.items)
+        sort_func = config.sort_method()
+        sort_func(@selected_category_items())
+        @sort_items(sort_func)
+
+    sort_items: (sort_func)->
+        @category_list.foreach((list, item)->
+            item.sort(sort_func)
         )
 

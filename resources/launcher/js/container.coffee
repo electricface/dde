@@ -45,6 +45,9 @@ class Container
                     else
                         config.sort_method_name = "name"
                     config.save()
+                    category_column.sort_items(config.sort_method())
+                    grid.render_dom(category_column.category_items(ALL_APPLICATION_CATEGORY_ID))
+                    grid.load_category(category_column.selected_category_id)
                 when 2
                     grid.load_category(category_column.selected_category_id)
                     grid.toggle_hidden_icons()

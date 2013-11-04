@@ -150,7 +150,6 @@ class Item extends Widget
             @remove_css_class(HIDE_ICON_CLASS, @element)
 
         @hidden_icons.remove(@)
-        echo @hidden_icons.length()
         if @hidden_icons.length() == 0
             grid.show_hidden_icons = false
 

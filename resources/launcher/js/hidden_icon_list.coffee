@@ -75,7 +75,9 @@ class HiddenIconList
 
         category_column.hide_empty_category()
         len = category_column.selected_category_items().length
-        grid.update_scroll_bar(len)
+        hlen = @hidden_icons_of_category(category_column.selected_category_id).length
+        # echo "update_scroll_bar(#{len - hlen})"
+        grid.update_scroll_bar(len - hlen)
         return
 
     hidden_icons_of_category: (cat_id)->

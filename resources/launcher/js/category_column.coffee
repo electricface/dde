@@ -184,6 +184,7 @@ class CategoryColumn
             @timeout_id = null
         @selected_category_id = ALL_APPLICATION_CATEGORY_ID
         @show_selected_category()
+
         sort_func = config.sort_method()
         sort_func(@selected_category_items())
         @sort_items(sort_func)

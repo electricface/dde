@@ -32,8 +32,8 @@ class Container
 
         category_column.load()
 
-        grid.init_grid()
         grid.hidden_icons.load()
+        grid.init_grid()
         grid.hidden_icons.hide()
 
         body.addEventListener("contextmenu", Container.contextmenu_callback(@))

@@ -34,7 +34,7 @@ connect_signals = ->
 
 
     DCore.signal_connect("draw_background", (info)->
-        body.style.backgroundImage = "url(#{info.path})"
+        # body.style.backgroundImage = "url(#{info.path})"
     )
 
 

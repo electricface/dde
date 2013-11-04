@@ -26,13 +26,14 @@ class Item extends Widget
         @load_img()
         @hidden_icons = grid.hidden_icons
 
+        @display_name = DCore.DEntry.get_name(@core)
         @name = create_element("div", "item_name", @element)
-        @name.innerText = DCore.DEntry.get_name(@core)
+        @name.innerText = @display_name
 
         @element.draggable = true
         @hide_element()
 
-        @try_set_title(DCore.DEntry.get_name(@core), 80)
+        @try_set_title(@display_name, 80)
         @display_mode = 'display'
 
         if (@is_autostart = DCore.Launcher.is_autostart(@core))

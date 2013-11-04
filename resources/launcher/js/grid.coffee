@@ -66,13 +66,13 @@ class Grid
         @item_selected?.select()
 
     show_items: (items) ->
-        # echo 'show_items'
         @update_selected(null)
 
         count = 0
         for i in items
             if @hidden_icons.is_hidden_icon(i)
                 count += 1
+        # echo "#{items.length} - #{count}"
         @update_scroll_bar(items.length - count)
 
         for own key, value of all_apps

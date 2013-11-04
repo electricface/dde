@@ -160,7 +160,8 @@ class CategoryColumn
                 all_apps[el].display_mode == "hidden"
             )
 
-            if all_is_hidden and Item.display_temp
+            if all_is_hidden and grid.show_hidden_icons
+
                 item.hidden()
                 if item.id == c.selected_category_id
                     c.selected_category_id = ALL_APPLICATION_CATEGORY_ID
@@ -174,7 +175,7 @@ class CategoryColumn
                 all_apps[el].display_mode != "hidden"
             )
 
-            if not_all_is_hidden or Item.display_temp
+            if not_all_is_hidden or grid.show_hidden_icons
                 item.show()
         )
 

@@ -161,10 +161,8 @@ class Grid
         @show_hidden_icons = !@show_hidden_icons
 
         if @show_hidden_icons
-            Item.display_temp = true
             @hidden_icons.show(category_column.selected_category_items())
         else
-            Item.display_temp = false
             @hidden_icons.hide()
 
         @update_scroll_bar(category_column.selected_category_items().length)

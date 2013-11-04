@@ -25,7 +25,9 @@ class HiddenIconList
         # key: the id of each instance of Item class
         # value: Item class instance
         @hidden_icons = {}
-        @length = 0
+
+    length: ->
+        Object.keys(@hidden_icons).length
 
     load: ->
         hidden_icon_ids = DCore.Launcher.load_hidden_apps()
@@ -44,13 +46,11 @@ class HiddenIconList
     add: (item)->
         if item
             @hidden_icons[item.id] = item
-            @length += 1
             @save()
         item
 
     remove: (item)->
         if item and delete @hidden_icons[item.id]
-            @length -= 1
             @save()
         item
 

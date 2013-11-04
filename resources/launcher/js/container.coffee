@@ -62,7 +62,7 @@ class Container
     _menu: ->
         menu = [[1, SORT_MESSAGE[config.sort_method_name]]]
 
-        if grid.hidden_icons.length > 0
+        if grid.hidden_icons.length() > 0
             menu.push([2, HIDDEN_ICON_MESSAGE[grid.show_hidden_icons]])
 
         menu

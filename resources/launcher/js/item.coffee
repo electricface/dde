@@ -19,7 +19,6 @@
 
 class Item extends Widget
     @theme_icon: null
-    @display_temp: false
 
     constructor: (@id, @core, @parent)->
         super
@@ -136,7 +135,7 @@ class Item extends Widget
         if HIDE_ICON_CLASS not in @element.classList
             @add_css_class(HIDE_ICON_CLASS, @element)
 
-        if not Item.display_temp and not grid.show_hidden_icons
+        if not grid.show_hidden_icons
             @element.style.display = 'none'
             grid.update_scroll_bar(category_column.selected_category_items().length )#- hidden_icons_num)
             category_column.hide_empty_category()
@@ -151,8 +150,9 @@ class Item extends Widget
             @remove_css_class(HIDE_ICON_CLASS, @element)
 
         @hidden_icons.remove(@)
-        if @hidden_icons.length == 0
-            Item.display_temp = false
+        echo @hidden_icons.length()
+        if @hidden_icons.length() == 0
+            grid.show_hidden_icons = false
 
     display_icon_temp: ->
         @element.style.display = 'block'
@@ -178,10 +178,8 @@ class Item extends Widget
     hide: ->
         @hide_element()
 
-    # use '->', Item.display_temp and @display_mode will be undifined when this
-    # function is pass to some other functions like setTimeout
     show: =>
-        @show_element() if Item.display_temp or @display_mode == 'display'
+        @show_element() if grid.show_hidden_icons or @display_mode == 'display'
 
     select: ->
         @element.setAttribute("class", "item item_selected")

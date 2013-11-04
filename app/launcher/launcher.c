@@ -358,7 +358,9 @@ int main(int argc, char* argv[])
 #endif
     save_pid();
 
+#ifdef NDEBUG
     g_timeout_add_seconds(3, _launcher_size_monitor, NULL);
+#endif
 
     init_i18n();
     gtk_init(&argc, &argv);

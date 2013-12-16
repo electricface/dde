@@ -48,7 +48,7 @@ else
     for user in users
         if user == DCore.Greeter.get_default_user()
             echo "already append default user"
-        else
+        else if not is_disable_user(user)
             user_image = get_user_image(user)
             u = new UserInfo(user, user, user_image)
             roundabout.appendChild(u.li)

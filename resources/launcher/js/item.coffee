@@ -70,6 +70,15 @@ class Item extends Widget
             if src != @img.src
                 @img.src = src
 
+    update: (core)->
+        @core = core
+        @name.innerText = DCore.DEntry.get_name(@core)
+        im = DCore.DEntry.get_icon(@core)
+        if im == null
+            im = DCore.get_theme_icon('invalid-dock_app', ITEM_IMG_SIZE)
+        if im
+            @img.src = im
+
     add_to_autostart: ->
         @is_autostart = true
         DCore.Launcher.add_to_autostart(@core)
@@ -101,6 +110,9 @@ class Item extends Widget
             [4, _("Send to do_ck"), dock!=null],
             [],
             [5, AUTOSTARTUP_MESSAGE[@is_autostart]]
+            [],
+            [6, _("_Uninstall")]
+            [7, _("_Uninstall with configurations")]
         ]
 
         if DCore.DEntry.internal()
@@ -172,6 +184,18 @@ class Item extends Widget
             when 3 then DCore.DEntry.copy_dereference_symlink([@core], DCore.Launcher.get_desktop_entry())
             when 4 then dock?.RequestDock_sync(DCore.DEntry.get_uri(@core).substring(7))
             when 5 then @toggle_autostart()
+            when 6
+                # TODO:
+                # 1. confirm.
+                # 2. stop launcher hiding when confirm.
+                # echo "Are you sure to uninstall this?"
+                DCore.Launcher.uninstall(@core, false)
+            when 7
+                # TODO:
+                # 1. confirm.
+                # 2. stop launcher hiding when confirm.
+                # echo "Are you sure to uninstall this?"
+                DCore.Launcher.uninstall(@core, true)
             when 100 then DCore.DEntry.report_bad_icon(@core)  # internal
 
     hide: ->
@@ -204,12 +228,144 @@ class Item extends Widget
         @element.scrollIntoViewIfNeeded()
 
     do_mouseover: =>
-        @element.style.background = "rgba(0, 183, 238, 0.2)"
-        @element.style.border = "1px rgba(255, 255, 255, 0.2) solid"
-        @element.style.borderRadius = "2px"
         grid.hover_item_id = @id
+        if not grid.clean_hover_temp
+            @element.style.background = "rgba(255, 255, 255, 0.15)"
+            @element.style.border = "1px rgba(255, 255, 255, 0.25) solid"
+            @element.style.borderRadius = "4px"
 
     do_mouseout: =>
         @element.style.background = ''
         @element.style.border = "1px rgba(255, 255, 255, 0.0) solid"
         @element.style.borderRadius = ""
+###
+class Item extends Widget
+    @theme_icon: null
+    @hover_item_id: null
+    @clean_hover_temp: false
+    @display_temp: false
+    constructor: (@id, @core)->
+        super
+        @load_image()
+        @name = create_element("div", "item_name", @element)
+        @name.innerText = DCore.DEntry.get_name(@core)
+        @element.draggable = true
+        @element.style.display = "none"
+        try_set_title(@element, DCore.DEntry.get_name(@core), 80)
+        @display_mode = 'display'
+        @is_autostart = DCore.Launcher.is_autostart(@core)
+        if @is_autostart
+            Item.theme_icon ?= DCore.get_theme_icon(AUTOSTART_ICON_NAME,
+                AUTOSTART_ICON_SIZE)
+            create_img("autostart_flag", Item.theme_icon, @element)
+
+    update: (core)->
+        @core = core
+        @name.innerText = DCore.DEntry.get_name(@core)
+        im = DCore.DEntry.get_icon(@core)
+        if im == null
+            im = DCore.get_theme_icon('invalid-dock_app', ITEM_IMG_SIZE)
+        @img.src = im
+
+    load_image: ->
+        im = DCore.DEntry.get_icon(@core)
+        if im == null
+            im = DCore.get_theme_icon('invalid-dock_app', ITEM_IMG_SIZE)
+        @img = create_img("", im, @element)
+        @img.onload = (e) =>
+            if @img.width == @img.height
+                @img.className = 'square_img'
+            else if @img.width > @img.height
+                @img.className = 'hbar_img'
+                new_height = ITEM_IMG_SIZE * @img.height / @img.width
+                grap = (ITEM_IMG_SIZE - Math.floor(new_height)) / 2
+                @img.style.padding = "#{grap}px 0px"
+            else
+                @img.className = 'vbar_img'
+        @img.onerror = (e) =>
+            src = DCore.get_theme_icon('invalid-dock_app', ITEM_IMG_SIZE)
+            if src != @img.src
+                @img.src = src
+
+    do_click : (e)=>
+        e?.stopPropagation()
+        @element.style.cursor = "wait"
+        DCore.DEntry.launch(@core, [])
+        Item.hover_item_id = @id
+        @element.style.cursor = "auto"
+        exit_launcher()
+
+    do_dragstart: (e)=>
+        e.dataTransfer.setData("text/uri-list", DCore.DEntry.get_uri(@core))
+        e.dataTransfer.setDragImage(@img, 20, 20)
+        e.dataTransfer.effectAllowed = "all"
+
+    _menu: ->
+        menu = [
+            [1, _("_Open")],
+            [],
+            [2, ITEM_HIDDEN_ICON_MESSAGE[@display_mode]],
+            [],
+            [3, _("Send to d_esktop"), not DCore.Launcher.is_on_desktop(@core)],
+            [4, _("Send to do_ck"), s_dock!=null],
+            [],
+            [5, AUTOSTARTUP_MESSAGE[@is_autostart]]
+            [],
+            [6, _("_Uninstall")]
+            [7, _("_Uninstall with configurations")]
+        ]
+
+        if DCore.DEntry.internal()
+            menu.push([])
+            menu.push([100, "report this bad icon"])
+
+        menu
+
+    @_contextmenu_callback: do ->
+        _callback_func = null
+        (item)->
+            f = (e) ->
+                item.element.removeEventListener('contextmenu', _callback_func)
+                item.element.contextMenu = build_menu(item._menu())
+                _callback_func = f
+
+    do_buildmenu: (e)=>
+        @_menu()
+
+    hide_icon: (e)=>
+        @display_mode = 'hidden'
+        if HIDE_ICON_CLASS not in @element.classList
+            @add_css_class(HIDE_ICON_CLASS, @element)
+        if not Item.display_temp and not is_show_hidden_icons
+            @element.style.display = 'none'
+            Item.display_temp = false
+        hidden_icons[@id] = @
+        save_hidden_apps()
+        hide_category()
+        if _get_hidden_icons_ids().length == 0
+            _update_scroll_bar(category_infos[selected_category_id].length - _get_hidden_icons_ids().length)
+            Item.display_temp = false
+
+    display_icon: (e)=>
+        @display_mode = 'display'
+        @element.style.display = 'block'
+        if HIDE_ICON_CLASS in @element.classList
+            @remove_css_class(HIDE_ICON_CLASS, @element)
+        delete hidden_icons[@id]
+        save_hidden_apps()
+        hidden_icons_num = _get_hidden_icons_ids().length
+        show_category()
+        if hidden_icons_num == 0
+            is_show_hidden_icons = false
+            _show_hidden_icons(is_show_hidden_icons)
+        _update_scroll_bar(category_infos[selected_category_id].length - hidden_icons_num)
+
+    display_icon_temp: ->
+        @element.style.display = 'block'
+        Item.display_temp = true
+        show_category()
+
+    toggle_icon: ->
+        if @display_mode == 'display'
+            @hide_icon()
+###

@@ -114,7 +114,7 @@ void try_get_deepin_icon(const char* _app_id, char** icon, int* operator_code)
     char* app_id = g_strdup(_app_id);
     to_lower_inplace(app_id);
     if (is_deepin_app_id(app_id)) {
-        g_debug("[try_get_deepin_icon] \"%s\" is deepin app id", app_id);
+        g_debug("[%s] \"%s\" is deepin app id", __func__, app_id);
         *operator_code = get_deepin_app_id_operator(app_id);
         const char* operator_names[] = {
             "USE_ICONNAME",
@@ -123,7 +123,7 @@ void try_get_deepin_icon(const char* _app_id, char** icon, int* operator_code)
             "USE_PATH",
             "USE_DOMINANTCOLOR"
         };
-        g_debug("[try_get_deepin_icon] operator code is %s", operator_names[*operator_code]);
+        g_debug("[%s] operator code is %s", __func__, operator_names[*operator_code]);
         switch (*operator_code) {
             case ICON_OPERATOR_USE_ICONNAME:
                 {
@@ -155,7 +155,7 @@ void try_get_deepin_icon(const char* _app_id, char** icon, int* operator_code)
 
         }
     } else {
-        g_debug("[try_get_deepin_icon] \"%s\" is not deepin app id", app_id);
+        g_debug("[%s] \"%s\" is not deepin app id", __func__, app_id);
         g_free(app_id);
     }
 }

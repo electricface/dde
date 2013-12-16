@@ -34,23 +34,49 @@ connect_signals = ->
 
 
     DCore.signal_connect("draw_background", (info)->
-        # body.style.backgroundImage = "url(#{info.path})"
+        img = new Image()
+        img.src = info.path
+        img.onload = ->
+            body.style.backgroundImage = "url(#{info.path})"
     )
 
 
     DCore.signal_connect("update_items", ->
-#     echo "update items"
+        # TODO:
+        # transform to new code.
+        #
+        # echo "update items:"
+        # echo "status: #{info.status}"
+        # echo "id: #{info.id}"
+        # echo "core: #{info.core}"
+        # echo "categories: #{info.categories}"
 
-#     applications = {}
-#     hidden_icons = {}
-#     category_infos = []
-#     _category.innerHTML = ""
-#     grid.innerHTML = ""
+        # if info.status.match(/^deleted$/i)
+        #     if Widget.look_up(info.id)?
+        #         echo 'deleted'
+        #         applications[info.id].destory()
+        #         delete applications[info.id]
+        #         for category_index in info.categories
+        #             category = category_infos["#{category_index}"]
+        #             category_infos["#{category_index}"] = category.filter((el)->
+        #                 el != info.id
+        #             )
+        # else if info.status.match(/^updated$/i)
+        #     if not Widget.look_up(info.id)?
+        #         echo 'added'
+        #         info.status = "added"
+        #         applications[info.id] = new Item(info.id, info.core)
+        #         for category_index in info.categories
+        #             category_infos["#{category_index}"].push(info.id)
+        #             sort_category_info(sort_methods[sort_method])
+        #     else
+        #         echo 'updated'
+        #         applications[info.id].update(info.core)
 
-#     init_all_applications()
-#     init_category_list()
-#     init_grid()
-#     _init_hidden_icons()
+        # update_items(category_infos[ALL_APPLICATION_CATEGORY_ID])
+        # # TODO:
+        # # load what should be shown
+        # grid_load_category(selected_category_id)
     )
 
 
@@ -83,11 +109,16 @@ reset = ->
         event = new Event("mouseout")
         Widget.look_up(Item.hover_item_id).element.dispatchEvent(event)
 
-exit_launcher = ->
-    DCore.Launcher.exit_gui()
-
-DCore.signal_connect("exit_launcher", ->
-    reset()
-)
+=======
+reset = ->
+    selected_category_id = ALL_APPLICATION_CATEGORY_ID
+    clean_search_bar()
+    s_box.focus()
+    save_hidden_apps()
+    _show_hidden_icons(false)
+    get_first_shown()?.scroll_to_view()
+    if Item.hover_item_id
+        event = new Event("mouseout")
+        Widget.look_up(Item.hover_item_id).element.dispatchEvent(event)
 ###
 

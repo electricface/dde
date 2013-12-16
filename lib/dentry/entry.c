@@ -228,23 +228,18 @@ char* dentry_get_uri(Entry* e)
 {
     TEST_GFILE(e, f)
         char* uri = g_file_get_uri(f);
-        /*
-         * some characters like ')', '(' may not be escaped
-         *
-         * ':' for scheme, like file:///...., the : cannot be escaped
-         * '/' for path separator, should be escaped
-         * '%' for the characters escaped, should be escaped
-         */
-        char* escaped_uri = g_uri_escape_string(uri, ":/%", FALSE);
+        char* escaped_uri = g_uri_escape_string(uri,
+                                                G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
+                                                FALSE);
         g_free(uri);
         return escaped_uri;
     TEST_GAPP(e, app)
         char* encode = g_uri_escape_string(g_desktop_app_info_get_filename(G_DESKTOP_APP_INFO(app)),
-                    "/", FALSE);
+                                           G_URI_RESERVED_CHARS_ALLOWED_IN_PATH,
+                                           FALSE);
         char* uri = g_strdup_printf("file://%s", encode);
         g_free(encode);
         return uri;
-    g_message("uri:---%s---",uri);
     TEST_END
 }
 
@@ -574,6 +569,7 @@ _file_is_archive (GFile *file)
         "application/x-ear",
         "application/x-arj",
         "application/x-gzip",
+        "application/gzip",
         "application/x-bzip-compressed-tar",
         "application/x-compressed-tar",
         "application/x-archive",
@@ -600,6 +596,9 @@ _file_is_archive (GFile *file)
     GFileInfo* info = g_file_query_info(file, "standard::content-type", G_FILE_QUERY_INFO_NONE, NULL, NULL);
     if (info != NULL) {
         mime_type = (char*)g_file_info_get_attribute_string(info, G_FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE);
+        char* path = g_file_get_path(file);
+        g_debug("[%s] \"%s\" MINE type is: \"%s\"", __func__, path, mime_type);
+        g_free(path);
 
         for (i = 0; i < G_N_ELEMENTS (archive_mime_types); i++) {
             if (!strcmp (mime_type, archive_mime_types[i])) {
@@ -1344,7 +1343,7 @@ GHashTable* _count_categories(ArrayContainer const fs)
         char** categories =
             _get_desktop_file_category(((GDesktopAppInfo**)fs.data)[i]);
 
-        g_debug("[_count_categories] app: %s",
+        g_debug("[%s] app: %s", __func__,
                 g_desktop_app_info_get_filename(((GDesktopAppInfo**)fs.data)[i]));
 
         if (categories == NULL) {
@@ -1366,8 +1365,8 @@ GHashTable* _count_categories(ArrayContainer const fs)
             g_hash_table_add(set, low_case_category);
 
             if (_is_valid_category(low_case_category)) {
-                g_debug("[_count_categories] === insert category: %s (lowcase:"
-                    " %s)", categories[j], low_case_category);
+                g_debug("[%s] === insert category: %s (lowcase: %s)", __func__,
+                        categories[j], low_case_category);
 
                 int value =
                     GPOINTER_TO_INT(g_hash_table_lookup(categories_count,
@@ -1380,7 +1379,7 @@ GHashTable* _count_categories(ArrayContainer const fs)
 
         g_strfreev(categories);
         g_hash_table_unref(set);
-        g_debug("[_count_categories] ===================");
+        g_debug("[%s] ===================", __func__);
     }
 
     return categories_count;

@@ -27,8 +27,8 @@
 
 #define SCHEMA_ID "com.deepin.dde.background"
 #define CURRENT_PCITURE "current-picture"
-#define BG_BLUR_PICT_CACHE_DIR "gaussian-background"
 
+GSettings* get_background_gsettings();
 void set_background(GdkWindow* win, GSettings* settings, double width, double height);
 void background_changed(GSettings* settings, char* key, gpointer user_data);
 

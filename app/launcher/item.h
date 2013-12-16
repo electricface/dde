@@ -12,9 +12,11 @@
 #define HIDDEN_ICONS "HiddenIcons"
 #define RECENTLY_USED_APPS "Recent"
 
+#define HIDDEN_APP_GROUP_NAME "HiddenApps"
+#define HIDDEN_APP_KEY_NAME "app_ids"
+
 void destroy_item_config();
 GPtrArray* get_autostart_paths();
 JS_EXPORT_API gboolean launcher_is_autostart(Entry* _item);
 
 #endif /* end of include guard: ITEM_H */
-

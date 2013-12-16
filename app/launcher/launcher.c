@@ -43,6 +43,7 @@
 #include "background.h"
 #include "file_monitor.h"
 #include "item.h"
+#include "uninstall.h"
 #include "test.h"
 #include "DBUS_launcher.h"
 
@@ -51,7 +52,7 @@
 static GKeyFile* launcher_config = NULL;
 PRIVATE GtkWidget* container = NULL;
 PRIVATE GtkWidget* webview = NULL;
-PRIVATE GSettings* dde_bg_g_settings = NULL;
+PRIVATE GSettings* background_gsettings = NULL;
 PRIVATE gboolean is_js_already = FALSE;
 PRIVATE gboolean is_launcher_shown = FALSE;
 
@@ -84,7 +85,7 @@ void _on_realize(GtkWidget* container)
     _update_size(screen, container);
     g_signal_connect(screen, "size-changed", G_CALLBACK(_update_size), container);
     if (is_js_already)
-        background_changed(dde_bg_g_settings, CURRENT_PCITURE, NULL);
+        background_changed(background_gsettings, CURRENT_PCITURE, NULL);
 }
 
 
@@ -101,7 +102,7 @@ void launcher_hide()
 {
     is_launcher_shown = FALSE;
     gtk_widget_hide(container);
-    js_post_message_simply("exit_launcher", NULL);
+    js_post_signal("exit_launcher");
 }
 
 
@@ -124,7 +125,7 @@ void launcher_quit()
     destroy_item_config();
     destroy_category_table();
     g_key_file_free(launcher_config);
-    g_object_unref(dde_bg_g_settings);
+    g_object_unref(background_gsettings);
     gtk_main_quit();
 }
 
@@ -155,9 +156,12 @@ void launcher_exit_gui()
 JS_EXPORT_API
 void launcher_notify_workarea_size()
 {
-    js_post_message_simply("workarea_changed",
-            "{\"x\":0, \"y\":0, \"width\":%d, \"height\":%d}",
-            gdk_screen_width(), gdk_screen_height());
+    JSObjectRef workarea_info = json_create();
+    json_append_number(workarea_info, "x", 0);
+    json_append_number(workarea_info, "y", 0);
+    json_append_number(workarea_info, "width", gdk_screen_width());
+    json_append_number(workarea_info, "height", gdk_screen_height());
+    js_post_message("workarea_changed", workarea_info);
 }
 
 
@@ -171,7 +175,7 @@ GFile* launcher_get_desktop_entry()
 JS_EXPORT_API
 void launcher_webview_ok()
 {
-    background_changed(dde_bg_g_settings, CURRENT_PCITURE, NULL);
+    background_changed(background_gsettings, CURRENT_PCITURE, NULL);
     is_js_already = TRUE;
 }
 
@@ -220,8 +224,22 @@ void check_version()
         save_app_config(launcher_config, LAUNCHER_CONF);
     }
 
+    if (g_strcmp0(LAUNCHER_VERSION, version) != 0) {
+        g_key_file_set_string(launcher_config, "main", "version", LAUNCHER_VERSION);
+        save_app_config(launcher_config, LAUNCHER_CONF);
+
+        system("sed -i 's/__Config__/"HIDDEN_APP_GROUP_NAME"/g' $HOME/.config/"APPS_INI);
+    }
+
     if (version != NULL)
         g_free(version);
+}
+
+
+static
+gboolean can_be_restart()
+{
+    return !is_launcher_shown && !is_launcher_uninstalling();
 }
 
 
@@ -229,7 +247,7 @@ gboolean _launcher_size_monitor(gpointer user_data)
 {
     struct rusage usg;
     getrusage(RUSAGE_SELF, &usg);
-    if (usg.ru_maxrss > RES_IN_MB(80) && !is_launcher_shown) {
+    if (usg.ru_maxrss > RES_IN_MB(180) && can_be_restart()) {
         g_spawn_command_line_async("launcher -r", NULL);
         return FALSE;
     }
@@ -380,8 +398,8 @@ int main(int argc, char* argv[])
 #ifndef NDEBUG
     g_signal_connect(container, "delete-event", G_CALLBACK(empty), NULL);
 #endif
-    dde_bg_g_settings = g_settings_new(SCHEMA_ID);
-    g_signal_connect(dde_bg_g_settings, "changed::"CURRENT_PCITURE,
+    background_gsettings = get_background_gsettings();
+    g_signal_connect(background_gsettings, "changed::"CURRENT_PCITURE,
                      G_CALLBACK(background_changed), NULL);
 
     gtk_widget_realize(container);
@@ -390,7 +408,7 @@ int main(int argc, char* argv[])
     GdkWindow* gdkwindow = gtk_widget_get_window(container);
     GdkRGBA rgba = {0, 0, 0, 0.0 };
     gdk_window_set_background_rgba(gdkwindow, &rgba);
-    set_background(gtk_widget_get_window(webview), dde_bg_g_settings,
+    set_background(gtk_widget_get_window(webview), background_gsettings,
                             gdk_screen_width(), gdk_screen_height());
 
     gdk_window_set_skip_taskbar_hint(gdkwindow, TRUE);
@@ -416,7 +434,6 @@ int main(int argc, char* argv[])
         launcher_show();
     }
     gtk_main();
-    destroy_monitors();
     return 0;
 }
 
